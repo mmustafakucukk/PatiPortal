@@ -561,7 +561,7 @@ class SahiplendirmeKaydi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hayvan_id = db.Column(db.Integer, db.ForeignKey("hayvanlar.id"), nullable=False, index=True)
     kullanici_id = db.Column(db.Integer, db.ForeignKey("kullanicilar.id"), nullable=False, index=True)
-    basvuru_id = db.Column(db.Integer, db.ForeignKey("sahiplendirme_basvurulari.id"))
+    basvuru_id = db.Column(db.Integer, db.ForeignKey("sahiplendirme_basvurulari.id"), unique=True, nullable=True)
     teslim_eden_id = db.Column(db.Integer, db.ForeignKey("kullanicilar.id", ondelete="SET NULL"))
     teslim_tarihi = db.Column(db.DateTime, nullable=False, default=simdi)
     teslim_notu = db.Column(db.Text)
