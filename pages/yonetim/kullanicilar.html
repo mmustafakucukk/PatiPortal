@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kullanıcılar – Yönetim – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner yonetim-duzen">
+  <div id="yonetim-menu"></div>
+  <div class="yonetim-icerik">
+    <div class="sayfa-baslik yonetim-baslik">
+      <div>
+        <h1>Kullanıcılar</h1>
+        <p>Rol ver, pasifleştir; görevli ve yönetici hesabı oluştur.</p>
+      </div>
+      <div class="satir" id="baslik-eylem"></div>
+    </div>
+    <form class="filtre-satiri filtre-satiri-sikisik" id="filtre" role="search" aria-label="Kullanıcı filtresi" novalidate>
+      <div class="form-alan">
+        <label for="arama">Ad veya e-postayla ara</label>
+        <input id="arama" name="q" type="search" maxlength="100" autocomplete="off" placeholder="Ör. Ayşe veya ornek@…">
+      </div>
+      <div class="form-alan">
+        <label for="rol">Rol</label>
+        <select id="rol" name="rol">
+          <option value="">Tüm roller</option>
+          <option value="ziyaretci">Ziyaretçi</option>
+          <option value="gorevli">Görevli</option>
+          <option value="admin">Sistem yöneticisi</option>
+        </select>
+      </div>
+      <div class="form-alan">
+        <label for="aktif">Durum</label>
+        <select id="aktif" name="aktif">
+          <option value="">Tümü</option>
+          <option value="true">Aktif</option>
+          <option value="false">Pasif</option>
+        </select>
+      </div>
+    </form>
+    <p class="sonuc-ozeti" id="sonuc-sayisi" aria-live="polite"></p>
+    <div id="kullanici-listesi"></div>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/yonetim-kullanicilar.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kurumlar – Yönetim – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner yonetim-duzen">
+  <div id="yonetim-menu"></div>
+  <div class="yonetim-icerik">
+    <div class="sayfa-baslik yonetim-baslik">
+      <div>
+        <h1>Kurumlar</h1>
+        <p>Barınak ve klinikleri ekle, düzenle; görevlilerini yönet.</p>
+      </div>
+      <div class="satir" id="baslik-eylem"></div>
+    </div>
+    <form class="filtre-satiri filtre-satiri-sikisik" id="filtre" role="search" aria-label="Kurum filtresi" novalidate>
+      <div class="form-alan">
+        <label for="arama">Ad veya adresle ara</label>
+        <input id="arama" name="q" type="search" maxlength="50" autocomplete="off" placeholder="Kurum adı…">
+      </div>
+      <div class="form-alan">
+        <label for="tur">Tür</label>
+        <select id="tur" name="tur">
+          <option value="">Tümü</option>
+          <option value="barinak">Barınak</option>
+          <option value="klinik">Klinik</option>
+        </select>
+      </div>
+      <div class="form-alan">
+        <label for="aktif">Durum</label>
+        <select id="aktif" name="aktif">
+          <option value="">Tümü</option>
+          <option value="true">Aktif</option>
+          <option value="false">Pasif</option>
+        </select>
+      </div>
+    </form>
+    <p class="sonuc-ozeti" id="sonuc-sayisi" aria-live="polite"></p>
+    <div id="kurum-listesi"></div>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/yonetim-kurumlar.js"></script>
+</body>
+</html>
