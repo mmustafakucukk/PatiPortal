@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Teslim saatleri – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde panel-govde-genis">
+  <details class="acilir" id="toplu-ekle">
+    <summary><span>Toplu saat ekle</span></summary>
+    <div class="acilir-icerik">
+      <form id="saat-formu" novalidate>
+        <div class="form-satir">
+          <div class="form-alan">
+            <label for="baslangic_tarihi">İlk gün</label>
+            <input id="baslangic_tarihi" name="baslangic_tarihi" type="date" required>
+          </div>
+          <div class="form-alan">
+            <label for="bitis_tarihi">Son gün</label>
+            <input id="bitis_tarihi" name="bitis_tarihi" type="date" required>
+          </div>
+        </div>
+        <fieldset class="form-alan">
+          <legend class="form-etiket">Haftanın günleri</legend>
+          <div class="secim-grubu secim-grubu-hap" id="gun-secimi">
+            <label><input type="checkbox" name="gunler" value="1" checked><span>Pzt</span></label>
+            <label><input type="checkbox" name="gunler" value="2" checked><span>Sal</span></label>
+            <label><input type="checkbox" name="gunler" value="3" checked><span>Çar</span></label>
+            <label><input type="checkbox" name="gunler" value="4" checked><span>Per</span></label>
+            <label><input type="checkbox" name="gunler" value="5" checked><span>Cum</span></label>
+            <label><input type="checkbox" name="gunler" value="6"><span>Cmt</span></label>
+            <label><input type="checkbox" name="gunler" value="0"><span>Paz</span></label>
+          </div>
+        </fieldset>
+        <div class="form-satir">
+          <div class="form-alan">
+            <label for="baslangic_saati">Başlangıç saati</label>
+            <input id="baslangic_saati" name="baslangic_saati" type="time" value="10:00" step="1800" required>
+          </div>
+          <div class="form-alan">
+            <label for="bitis_saati">Bitiş saati</label>
+            <input id="bitis_saati" name="bitis_saati" type="time" value="16:00" step="1800" required>
+          </div>
+        </div>
+        <div class="form-satir">
+          <fieldset class="form-alan">
+            <legend class="form-etiket">Her randevunun süresi</legend>
+            <div class="secim-grubu">
+              <label><input type="radio" name="sure" value="30" checked><span>30 dk</span></label>
+              <label><input type="radio" name="sure" value="60"><span>60 dk</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <button class="btn btn-cerceve-ana btn-blok" type="submit">Önizle</button>
+      </form>
+      <div id="onizleme" aria-live="polite" style="margin-top:16px"></div>
+    </div>
+  </details>
+
+  <section class="panel-bolum" aria-labelledby="takvim-baslik">
+    <h2 id="takvim-baslik" class="gizli-erisim">Haftalık teslim saatleri</h2>
+    <nav class="gun-gezinti" aria-label="Hafta seçimi" style="margin-top:8px">
+      <button class="btn btn-ikon" type="button" id="onceki-hafta" aria-label="Önceki hafta">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="gun-gezinti-orta"><strong id="hafta-baslik" aria-live="polite">Bu hafta</strong></div>
+      <button class="btn btn-ikon" type="button" id="sonraki-hafta" aria-label="Sonraki hafta">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </nav>
+    <div id="takvim"></div>
+  </section>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-teslim-saatleri.js"></script>
+</body>
+</html>

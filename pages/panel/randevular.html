@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Randevular – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde">
+  <nav class="gun-gezinti" aria-label="Gün seçimi" id="gun-gezinti" hidden>
+    <button class="btn btn-ikon" type="button" id="onceki-gun" aria-label="Önceki gün">
+      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="gun-gezinti-orta">
+      <strong id="gun-baslik" aria-live="polite">Bugün</strong>
+      <label class="gizli-erisim" for="gun-secimi">Tarih seç</label>
+      <input id="gun-secimi" type="date">
+    </div>
+    <button class="btn btn-ikon" type="button" id="sonraki-gun" aria-label="Sonraki gün">
+      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </nav>
+  <p class="sonuc-ozeti" id="gun-ozeti" aria-live="polite"></p>
+  <div id="randevu-listesi"></div>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-randevular.js"></script>
+</body>
+</html>
