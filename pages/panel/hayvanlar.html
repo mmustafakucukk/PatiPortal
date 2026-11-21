@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hayvanlar – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde panel-govde-genis">
+  <form class="filtre-satiri filtre-satiri-sikisik" id="filtre" role="search" aria-label="Hayvan filtresi" novalidate>
+    <div class="form-alan">
+      <label for="arama">İsimle ara</label>
+      <div class="girdi-grubu girdi-grubu-sol">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="arama" name="q" type="search" placeholder="Ad veya cins…" maxlength="50" autocomplete="off">
+      </div>
+    </div>
+    <div class="form-alan">
+      <label for="tur">Tür</label>
+      <select id="tur" name="tur"><option value="">Tüm türler</option></select>
+    </div>
+    <div class="form-alan">
+      <label for="durum">Durum</label>
+      <select id="durum" name="durum">
+        <option value="">Tüm durumlar</option>
+        <option value="barinakta">Yuva arıyor</option>
+        <option value="tedavide">Tedavide</option>
+        <option value="sahiplendirildi">Yuvasını buldu</option>
+      </select>
+    </div>
+  </form>
+
+  <p class="sonuc-ozeti" id="sonuc-sayisi" aria-live="polite">Hayvanlar yükleniyor…</p>
+  <div id="hayvan-listesi"></div>
+  <div id="sayfalama"></div>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-hayvanlar.js"></script>
+</body>
+</html>

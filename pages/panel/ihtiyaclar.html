@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>İhtiyaçlar – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde">
+  <details class="acilir" id="yeni">
+    <summary><span>Yeni ihtiyaç</span></summary>
+    <div class="acilir-icerik">
+      <form id="ihtiyac-formu" novalidate>
+        <fieldset class="form-alan">
+          <legend class="form-etiket">Tür</legend>
+          <div class="secim-grubu secim-grubu-hap">
+            <label><input type="radio" name="tur" value="mama" required><span>Mama</span></label>
+            <label><input type="radio" name="tur" value="ilac"><span>İlaç</span></label>
+            <label><input type="radio" name="tur" value="malzeme"><span>Malzeme</span></label>
+            <label><input type="radio" name="tur" value="diger"><span>Diğer</span></label>
+          </div>
+        </fieldset>
+        <div class="form-alan">
+          <label for="baslik">Başlık</label>
+          <input id="baslik" name="baslik" type="text" maxlength="80" placeholder="Ör. Yavru kedi maması" required>
+        </div>
+        <div class="form-alan">
+          <label for="aciklama">Açıklama <span class="istege-bagli">(isteğe bağlı)</span></label>
+          <textarea id="aciklama" name="aciklama" rows="2" maxlength="500" placeholder="Marka, özellik, son kullanma tarihi gibi notlar"></textarea>
+        </div>
+        <div class="form-satir">
+          <div class="form-alan">
+            <label for="miktar">Miktar</label>
+            <input id="miktar" name="miktar" type="number" inputmode="decimal" min="1" step="any" required>
+          </div>
+          <div class="form-alan">
+            <label for="birim">Birim</label>
+            <input id="birim" name="birim" type="text" list="birim-onerileri" maxlength="20" placeholder="kg, adet, kutu…" required>
+            <datalist id="birim-onerileri">
+              <option value="kg"></option><option value="adet"></option><option value="kutu"></option>
+              <option value="paket"></option><option value="litre"></option><option value="şişe"></option>
+            </datalist>
+          </div>
+        </div>
+        <fieldset class="form-alan">
+          <legend class="form-etiket">Aciliyet</legend>
+          <div class="secim-grubu">
+            <label><input type="radio" name="aciliyet" value="dusuk" required><span>Düşük</span></label>
+            <label><input type="radio" name="aciliyet" value="orta"><span>Orta</span></label>
+            <label><input type="radio" name="aciliyet" value="yuksek"><span>Yüksek</span></label>
+          </div>
+        </fieldset>
+        <button class="btn btn-ana btn-blok" type="submit">İhtiyacı yayınla</button>
+      </form>
+    </div>
+  </details>
+
+  <h2 class="hesap-bolum-baslik" style="margin-top:24px">Açık ihtiyaçlar</h2>
+  <div id="acik-ihtiyaclar" class="yigin" style="gap:16px"></div>
+
+  <details class="acilir panel-bolum" id="karsilananlar-bolumu">
+    <summary><span>Karşılanan ihtiyaçlar</span></summary>
+    <div class="acilir-icerik" id="karsilananlar"></div>
+  </details>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-ihtiyaclar.js"></script>
+</body>
+</html>

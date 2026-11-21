@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aşı türleri – Yönetim – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner yonetim-duzen">
+  <div id="yonetim-menu"></div>
+  <div class="yonetim-icerik">
+    <div class="sayfa-baslik yonetim-baslik">
+      <div>
+        <h1>Aşı türleri</h1>
+        <p>Aşı türleri ve hangi hayvan türüne hangi aşının zorunlu olduğu.</p>
+      </div>
+      <div class="satir" id="baslik-eylem"></div>
+    </div>
+    <section class="panel-bolum" aria-labelledby="gereklilik-baslik">
+      <div class="kart-baslik">
+        <h2 id="gereklilik-baslik">Aşı gereklilikleri</h2>
+      </div>
+      <p class="form-yardim" id="gereklilik-yardim">Satırlar aşı türleri, sütunlar hayvan türleridir. İşaretli kutu, o aşının o tür için zorunlu olduğu anlamına gelir. Değişiklikler "Kaydet" ile birlikte gönderilir.</p>
+      <div id="gereklilik-tablosu"></div>
+    </section>
+    <section class="panel-bolum" aria-labelledby="asi-liste-baslik">
+      <h2 id="asi-liste-baslik" class="alt-baslik">Aşı türleri</h2>
+      <div id="asi-listesi"></div>
+    </section>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/yonetim-asi-turleri.js"></script>
+</body>
+</html>

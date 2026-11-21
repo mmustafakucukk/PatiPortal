@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sahiplenme başvuruları – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<div class="ust-cubuk-sekmeler" id="sekme-cubugu" style="background:var(--kart)" hidden>
+  <div class="sekmeler sekmeler-esit" role="tablist" aria-label="Başvuru durumları" id="basvuru-sekmeleri" style="max-width:var(--panel-genislik);margin-inline:auto">
+    <button class="sekme" role="tab" type="button" id="sekme-bekleyen" aria-controls="basvuru-listesi" data-sekme="bekleyen">Bekleyen</button>
+    <button class="sekme" role="tab" type="button" id="sekme-onaylanan" aria-controls="basvuru-listesi" data-sekme="onaylanan">Onaylanan</button>
+    <button class="sekme" role="tab" type="button" id="sekme-reddedilen" aria-controls="basvuru-listesi" data-sekme="reddedilen">Reddedilen</button>
+  </div>
+</div>
+
+<main id="icerik" class="panel-govde">
+  <div id="basvuru-listesi" role="tabpanel" aria-live="polite"></div>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-basvurular.js"></script>
+</body>
+</html>

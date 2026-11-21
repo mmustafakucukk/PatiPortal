@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kurum – PatiPortal</title>
+  <meta name="description" content="Barınak veya kliniğin iletişim bilgileri, yuva arayan hayvanları ve açık ihtiyaçları.">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik">
+  <div class="konteyner" style="padding-top:24px">
+    <div id="kurum-bilgi" aria-live="polite"></div>
+  </div>
+
+  <section class="bolum" aria-labelledby="kurum-hayvanlar-baslik" id="kurum-hayvanlar-bolum" hidden>
+    <div class="konteyner">
+      <div class="bolum-baslik">
+        <div>
+          <h2 id="kurum-hayvanlar-baslik">Yuva arayan dostlar</h2>
+          <p id="kurum-hayvan-sayisi"></p>
+        </div>
+        <a class="baglanti" id="kurum-tum-hayvanlar" href="/hayvanlar.html">Tümünü gör</a>
+      </div>
+      <div class="izgara" id="kurum-hayvanlar"></div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-beyaz" aria-labelledby="kurum-ihtiyaclar-baslik" id="kurum-ihtiyaclar-bolum" hidden>
+    <div class="konteyner">
+      <div class="bolum-baslik">
+        <div>
+          <h2 id="kurum-ihtiyaclar-baslik">Açık ihtiyaçlar</h2>
+          <p>Söz verdiğinde kurum görevlisi seninle iletişime geçer.</p>
+        </div>
+      </div>
+      <div class="izgara izgara-genis" id="kurum-ihtiyaclar"></div>
+    </div>
+  </section>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/kurum.js"></script>
+</body>
+</html>

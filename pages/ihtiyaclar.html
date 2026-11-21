@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Acil ihtiyaçlar – PatiPortal</title>
+  <meta name="description" content="Barınak ve kliniklerin acil mama, ilaç ve malzeme ihtiyaçları. Destek sözü ver, kurum seninle iletişime geçsin.">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik">
+  <div class="konteyner">
+    <div class="sayfa-baslik">
+      <div>
+        <h1>Acil ihtiyaçlar</h1>
+        <p>Kurumların beklediği mama, ilaç ve malzemeler. Söz verdiğinde kurum görevlisi seninle iletişime geçer.</p>
+      </div>
+    </div>
+
+    <form class="filtre-satiri" id="ihtiyac-filtre" aria-label="İhtiyaç filtresi" novalidate>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Tür</legend>
+        <div class="secim-grubu secim-grubu-hap">
+          <label><input type="radio" name="tur" value="" checked><span>Hepsi</span></label>
+          <label><input type="radio" name="tur" value="mama"><span>Mama</span></label>
+          <label><input type="radio" name="tur" value="ilac"><span>İlaç</span></label>
+          <label><input type="radio" name="tur" value="malzeme"><span>Malzeme</span></label>
+          <label><input type="radio" name="tur" value="diger"><span>Diğer</span></label>
+        </div>
+      </fieldset>
+      <div class="form-alan">
+        <label for="kurum">Kurum</label>
+        <select id="kurum" name="kurum"><option value="">Tüm kurumlar</option></select>
+      </div>
+    </form>
+
+    <div class="satir" style="justify-content:space-between;margin-bottom:12px">
+      <p class="sonuc-ozeti" id="sonuc-sayisi" aria-live="polite" style="margin:0">İhtiyaçlar yükleniyor…</p>
+      <ul class="ilerleme-aciklama" aria-label="İlerleme çubuğu açıklaması">
+        <li>Teslim alındı</li>
+        <li class="soz">Söz verildi</li>
+      </ul>
+    </div>
+    <div class="izgara izgara-genis" id="acik-ihtiyaclar"></div>
+  </div>
+
+  <section class="bolum" aria-labelledby="karsilanan-baslik">
+    <div class="konteyner">
+      <div class="bolum-baslik">
+        <div>
+          <h2 id="karsilanan-baslik">Son karşılanan ihtiyaçlar</h2>
+          <p>Destek veren herkese teşekkürler.</p>
+        </div>
+      </div>
+      <div class="izgara izgara-genis" id="karsilananlar"></div>
+    </div>
+  </section>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/ihtiyaclar.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Barınak ve klinikler – PatiPortal</title>
+  <meta name="description" content="PatiPortal'daki barınak ve veteriner klinikleri, yuva arayan hayvan ve açık ihtiyaç sayılarıyla.">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner" style="padding-bottom:56px">
+  <div class="sayfa-baslik">
+    <div>
+      <h1>Barınak ve klinikler</h1>
+      <p id="sonuc-sayisi" aria-live="polite">Kurumlar yükleniyor…</p>
+    </div>
+  </div>
+
+  <form class="filtre-satiri" id="kurum-filtre" role="search" aria-label="Kurum filtresi" novalidate>
+    <fieldset class="form-alan">
+      <legend class="form-etiket">Tür</legend>
+      <div class="secim-grubu secim-grubu-hap">
+        <label><input type="radio" name="tur" value="" checked><span>Hepsi</span></label>
+        <label><input type="radio" name="tur" value="barinak"><span>Barınak</span></label>
+        <label><input type="radio" name="tur" value="klinik"><span>Klinik</span></label>
+      </div>
+    </fieldset>
+    <div class="form-alan">
+      <label for="arama">Ad veya adresle ara</label>
+      <div class="girdi-grubu girdi-grubu-sol">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="arama" name="q" type="search" placeholder="Kurum adı veya semt…" maxlength="50" autocomplete="off">
+      </div>
+    </div>
+  </form>
+
+  <div class="izgara izgara-genis" id="kurum-listesi"></div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/kurumlar.js"></script>
+</body>
+</html>

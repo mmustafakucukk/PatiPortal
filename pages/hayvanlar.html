@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Yuva arayan dostlar – PatiPortal</title>
+  <meta name="description" content="Barınak ve kliniklerde yuva arayan kedi, köpek ve diğer hayvanları türe, yaşa, cinsiyete ve aşı durumuna göre filtrele.">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner">
+  <div class="sayfa-baslik">
+    <div>
+      <h1>Yuva arayan dostlar</h1>
+      <p aria-live="polite"><span id="sonuc-sayisi">Hayvanlar yükleniyor…</span><span class="yalniz-genis"> · Filtreleri soldan değiştirebilirsin.</span></p>
+    </div>
+    <div class="liste-araclar">
+      <div class="girdi-grubu girdi-grubu-sol">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label for="arama" class="gizli-erisim">İsim veya cinsle ara</label>
+        <input id="arama" type="search" placeholder="İsim veya cinsle ara…" maxlength="50" autocomplete="off">
+      </div>
+      <button class="btn btn-cerceve filtre-ac-btn" type="button" id="filtre-ac" aria-haspopup="dialog">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        <span id="filtre-ac-metin">Filtreler</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="liste-duzeni">
+    <aside class="kart filtre-karti" id="filtre-karti" aria-labelledby="filtre-baslik">
+      <div class="filtre-baslik">
+        <h2 id="filtre-baslik">Filtreler</h2>
+        <button class="baglanti baglanti-sade" type="button" id="filtre-temizle">Temizle</button>
+      </div>
+      <form id="filtre-formu" novalidate>
+        <fieldset class="filtre-grubu">
+          <legend>Tür</legend>
+          <div class="secim-grubu secim-grubu-hap" id="tur-secim">
+            <label><input type="radio" name="tur" value="" checked><span>Hepsi</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="filtre-grubu">
+          <legend>Cinsiyet</legend>
+          <label class="secim-kutusu"><input type="radio" name="cinsiyet" value="disi"> Dişi</label>
+          <label class="secim-kutusu"><input type="radio" name="cinsiyet" value="erkek"> Erkek</label>
+          <label class="secim-kutusu"><input type="radio" name="cinsiyet" value="" checked> Hepsi</label>
+        </fieldset>
+        <fieldset class="filtre-grubu">
+          <legend>Yaş</legend>
+          <label class="secim-kutusu"><input type="radio" name="yas" value="yavru"> Yavru (0–1)</label>
+          <label class="secim-kutusu"><input type="radio" name="yas" value="genc"> Genç (1–3)</label>
+          <label class="secim-kutusu"><input type="radio" name="yas" value="yetiskin"> Yetişkin (3+)</label>
+          <label class="secim-kutusu"><input type="radio" name="yas" value="" checked> Hepsi</label>
+        </fieldset>
+        <fieldset class="filtre-grubu">
+          <legend>Sağlık</legend>
+          <label class="secim-kutusu"><input type="checkbox" name="asi" value="1"> Aşıları tam</label>
+          <label class="secim-kutusu"><input type="checkbox" name="kisir" value="1"> Kısırlaştırılmış</label>
+        </fieldset>
+        <div class="filtre-grubu">
+          <label for="kurum">Kurum</label>
+          <select id="kurum" name="kurum"><option value="">Tüm kurumlar</option></select>
+        </div>
+      </form>
+    </aside>
+
+    <section aria-label="Hayvan listesi">
+      <div class="izgara" id="hayvan-listesi"></div>
+      <div id="sayfalama"></div>
+    </section>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/hayvanlar.js"></script>
+</body>
+</html>

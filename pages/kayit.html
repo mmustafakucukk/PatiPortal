@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kayıt ol – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="dar-sayfa">
+  <div class="kart">
+    <h1>Kayıt ol</h1>
+    <p class="sayfa-giris">Sahiplenme başvurusu yapmak ve ihtiyaçlara destek olmak için bir hesap oluştur.</p>
+    <form id="kayit-formu" novalidate>
+      <div class="form-alan">
+        <label for="ad_soyad">Ad soyad <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="ad_soyad" name="ad_soyad" type="text" autocomplete="name" maxlength="80" required>
+      </div>
+      <div class="form-alan">
+        <label for="email">E-posta <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" required>
+      </div>
+      <div class="form-alan">
+        <label for="telefon">Telefon <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="telefon" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="05xx xxx xx xx" maxlength="20" aria-describedby="telefon-yardim" required>
+        <p class="form-yardim" id="telefon-yardim">Başvurularında kurum seninle bu numaradan iletişime geçer.</p>
+      </div>
+      <div class="form-alan">
+        <label for="sifre">Şifre <span class="zorunlu" aria-hidden="true">*</span></label>
+        <div class="girdi-grubu">
+          <input id="sifre" name="sifre" type="password" autocomplete="new-password" aria-describedby="sifre-kurallari" required>
+          <button class="btn btn-ikon" type="button" id="sifre-goster" aria-controls="sifre"></button>
+        </div>
+        <ul class="sifre-kurallari" id="sifre-kurallari" aria-live="polite">
+          <li data-kural="uzunluk">En az 8 karakter</li>
+        </ul>
+      </div>
+      <div class="form-alan">
+        <label for="sifre_tekrar">Şifre tekrar <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="sifre_tekrar" name="sifre_tekrar" type="password" autocomplete="new-password" aria-describedby="sifre-eslesme" required>
+        <ul class="sifre-kurallari" id="sifre-eslesme" aria-live="polite">
+          <li data-kural="eslesme">Şifreler aynı</li>
+        </ul>
+      </div>
+      <div class="form-alan">
+        <label class="secim-kutusu secim-kutusu-ust">
+          <input type="checkbox" name="kvkk_onay" required>
+          <span><a href="/kvkk.html" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.</span>
+        </label>
+      </div>
+      <button class="btn btn-ana btn-blok" type="submit">Kayıt ol</button>
+    </form>
+    <p class="form-alt-baglanti">Zaten hesabın var mı? <a id="giris-baglantisi" href="/giris.html">Giriş yap</a></p>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/kayit.js"></script>
+</body>
+</html>

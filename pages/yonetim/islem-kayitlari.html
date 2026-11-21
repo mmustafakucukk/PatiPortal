@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>İşlem kayıtları – Yönetim – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="konteyner yonetim-duzen">
+  <div id="yonetim-menu"></div>
+  <div class="yonetim-icerik">
+    <div class="sayfa-baslik yonetim-baslik">
+      <div>
+        <h1>İşlem kayıtları</h1>
+        <p>Sistemde kim, ne zaman, hangi işlemi yaptı.</p>
+      </div>
+      <div class="satir" id="baslik-eylem"></div>
+    </div>
+    <form class="filtre-satiri filtre-satiri-sikisik" id="filtre" aria-label="İşlem kaydı filtresi" novalidate>
+      <div class="form-alan">
+        <label for="baslangic">Başlangıç</label>
+        <input id="baslangic" name="baslangic" type="date" disabled>
+      </div>
+      <div class="form-alan">
+        <label for="bitis">Bitiş</label>
+        <input id="bitis" name="bitis" type="date" disabled>
+      </div>
+      <div class="form-alan">
+        <label for="kullanici">Kullanıcı</label>
+        <select id="kullanici" name="kullanici" disabled><option value="">Tümü</option></select>
+      </div>
+      <div class="form-alan">
+        <label for="kurum">Kurum</label>
+        <select id="kurum" name="kurum" disabled><option value="">Tümü</option></select>
+      </div>
+      <div class="form-alan">
+        <label for="islem">İşlem türü</label>
+        <select id="islem" name="islem" disabled><option value="">Tümü</option></select>
+      </div>
+    </form>
+    <div id="kayit-listesi"></div>
+  </div>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/yonetim-islem-kayitlari.js"></script>
+</body>
+</html>
