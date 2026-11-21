@@ -29,9 +29,21 @@ def create_app(ortam=None):
 
     @login_manager.user_loader
     def kullanici_yukle(user_id):
-        # Adım 3'te veritabanındaki Kullanici modeline bağlanacak
-        return None
-    
+        from sqlalchemy.orm import selectinload
+        from app.models import Kullanici, KurumGorevlisi
+
+        try:
+            kid = int(user_id)
+        except (TypeError, ValueError):
+            return None
+        return db.session.get(
+            Kullanici,
+            kid,
+            options=[
+                selectinload(Kullanici.kurum_gorevleri).joinedload(KurumGorevlisi.kurum)
+            ],
+        )
+
     # Yetkisiz isteklerde HTML yönlendirmesi yerine JSON 401 döndür
     @login_manager.unauthorized_handler
     def yetkisiz_erisim():
@@ -41,8 +53,9 @@ def create_app(ortam=None):
     _hata_yakalayicilari_kaydet(app)
 
     # Blueprint'ler ilerleyen adımlarda buraya kaydedilecek
-    # from app.routes.auth import auth_bp
-    # app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    # Bölüm 3 (Abdulhafız): kimlik doğrulama
+    from app.routes.auth import auth_bp
+    app.register_blueprint(auth_bp)
 
     # Bölüm 4 (Samet): hayvanlar, fotoğraflar, aşılar, ihtiyaçlar, hayvan türleri
     from app.utils.hatalar import hata_yakalayicilarini_kaydet
@@ -81,6 +94,12 @@ def create_app(ortam=None):
 
 
 def _hata_yakalayicilari_kaydet(app):
+    from flask_wtf.csrf import CSRFError
+
+    @app.errorhandler(CSRFError)
+    def csrf_hatasi(err):
+        return hata_yaniti("Güvenlik doğrulaması (CSRF) başarısız. Sayfayı yenileyip tekrar deneyin.", 400)
+
     @app.errorhandler(400)
     def bad_request(err):
         return hata_yaniti("Geçersiz istek.", 400)
