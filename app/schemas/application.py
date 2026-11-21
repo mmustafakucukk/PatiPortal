@@ -98,3 +98,9 @@ class BasvuruFiltreSemasi(Sema):
     durum = secim(BasvuruDurumu)
     animal_id = tam_sayi(en_az=1)
     kurum_id = tam_sayi(en_az=1)
+
+from app.sabitler import RandevuDurumu
+
+
+class RandevuFiltreSemasi(Sema):
+    durum = secim(RandevuDurumu)

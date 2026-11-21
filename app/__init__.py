@@ -53,13 +53,15 @@ def create_app(ortam=None):
     _hata_yakalayicilari_kaydet(app)
 
     # Blueprint'ler ilerleyen adımlarda buraya kaydedilecek
-   # Bölüm 3 (Abdulhafız): kimlik doğrulama, kullanıcı, kurum ve başvurular
+    # Bölüm 3 (Abdulhafız): kimlik doğrulama, kullanıcı, kurum, başvuru, teslimat ve istatistik
     from app.routes.auth import auth_bp
     from app.routes.users import users_bp
     from app.routes.institutions import institutions_bp
     from app.routes.applications import applications_bp
+    from app.routes.adoptions import adoptions_bp
+    from app.routes.stats import stats_bp
 
-    for blueprint in (auth_bp, users_bp, institutions_bp, applications_bp):
+    for blueprint in (auth_bp, users_bp, institutions_bp, applications_bp, adoptions_bp, stats_bp):
         app.register_blueprint(blueprint)
 
     # Bölüm 4 (Samet): hayvanlar, fotoğraflar, aşılar, ihtiyaçlar, hayvan türleri
