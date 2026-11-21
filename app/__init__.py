@@ -44,6 +44,18 @@ def create_app(ortam=None):
     # from app.routes.auth import auth_bp
     # app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
+    # Bölüm 4 (Samet): hayvanlar, fotoğraflar, aşılar, ihtiyaçlar, hayvan türleri
+    from app.utils.hatalar import hata_yakalayicilarini_kaydet
+    from app.routes.animals import animals_bp
+    from app.routes.photos import photos_bp, uploads_bp
+    from app.routes.vaccinations import vaccinations_bp
+    from app.routes.needs import needs_bp
+    from app.routes.species import species_bp
+
+    hata_yakalayicilarini_kaydet(app)
+    for blueprint in (animals_bp, photos_bp, uploads_bp, vaccinations_bp, needs_bp, species_bp):
+        app.register_blueprint(blueprint)
+
     # Sağlık kontrolü (iskelet testi için)
     @app.get("/api/health")
     def saglik_kontrolu():
