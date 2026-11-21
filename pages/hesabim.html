@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hesabım – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik" class="orta-sayfa">
+  <h1>Hesabım</h1>
+  <p class="sayfa-giris" id="selam">Başvurularını, randevularını ve sahiplendiğin dostlarını buradan takip edebilirsin.</p>
+
+  <div class="sekmeler" role="tablist" aria-label="Hesap bölümleri" id="hesap-sekmeleri">
+    <button class="sekme" role="tab" type="button" id="sekme-basvurular" aria-controls="panel-basvurular" data-sekme="basvurular">Başvurularım</button>
+    <button class="sekme" role="tab" type="button" id="sekme-randevular" aria-controls="panel-randevular" data-sekme="randevular">Randevularım</button>
+    <button class="sekme" role="tab" type="button" id="sekme-sahiplendiklerim" aria-controls="panel-sahiplendiklerim" data-sekme="sahiplendiklerim">Sahiplendiklerim</button>
+    <button class="sekme" role="tab" type="button" id="sekme-destekler" aria-controls="panel-destekler" data-sekme="destekler">Destek sözlerim</button>
+    <button class="sekme" role="tab" type="button" id="sekme-profil" aria-controls="panel-profil" data-sekme="profil">Profil</button>
+  </div>
+
+  <section class="sekme-paneli" role="tabpanel" id="panel-basvurular" aria-labelledby="sekme-basvurular" tabindex="0" hidden></section>
+  <section class="sekme-paneli" role="tabpanel" id="panel-randevular" aria-labelledby="sekme-randevular" tabindex="0" hidden></section>
+  <section class="sekme-paneli" role="tabpanel" id="panel-sahiplendiklerim" aria-labelledby="sekme-sahiplendiklerim" tabindex="0" hidden></section>
+  <section class="sekme-paneli" role="tabpanel" id="panel-destekler" aria-labelledby="sekme-destekler" tabindex="0" hidden></section>
+  <section class="sekme-paneli" role="tabpanel" id="panel-profil" aria-labelledby="sekme-profil" tabindex="0" hidden></section>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/hesabim.js"></script>
+</body>
+</html>
