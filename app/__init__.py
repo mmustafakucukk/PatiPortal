@@ -22,7 +22,7 @@ def create_app(ortam=None):
 
     # Eklentileri uygulamaya bağla
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
@@ -96,6 +96,10 @@ def create_app(ortam=None):
         if os.path.isfile(tam_yol):
             return send_from_directory(pages_dizini, dosya_yolu)
         abort(404)
+
+    # CLI komutları (flask seed)
+    from app.seed import cli_komutlarini_kaydet
+    cli_komutlarini_kaydet(app)
 
     return app
 
