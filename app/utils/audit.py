@@ -8,11 +8,14 @@ logger = logging.getLogger("patiportal.audit")
 def islem_kaydet(islem_turu, hedef_tablo, hedef_id=None, detay=None, kullanici_id=None):
     """
     Sistemdeki kritik işlemleri (başvuru oluşturma/onaylama/reddetme,
-    kullanıcı rol değişikliği, hayvan güncelleme vb.) kaydeder.
+    kullanıcı rol değişikliği, hayvan güncelleme vb.) İşlem Kayıtları (Tablo 16) tablosuna yazar.
 
-    Not: Hazım 'IslemKaydi' (Tablo 16) modelini models.py'ye eklediğinde
-    veritabanı ekleme satırı burada tek yerden aktif edilecek.
+    Commit ETMEZ: kayıt, çağıran fonksiyonun işlemiyle (transaction) birlikte kaydedilir.
+    Böylece asıl işlem başarısız olursa log da yazılmaz.
     """
+    from app.extensions import db
+    from app.models import IslemKaydi
+
     if kullanici_id is None and current_user.is_authenticated:
         kullanici_id = getattr(current_user, "id", None)
 
@@ -28,14 +31,11 @@ def islem_kaydet(islem_turu, hedef_tablo, hedef_id=None, detay=None, kullanici_i
         detay,
     )
 
-    # Hazım Tablo 16 (IslemKaydi) modelini eklediğinde açılacak kısım:
-    # from app.extensions import db
-    # from app.models import IslemKaydi
-    # kayit = IslemKaydi(
-    #     kullanici_id=kullanici_id,
-    #     islem_turu=islem_turu,
-    #     hedef_tablo=hedef_tablo,
-    #     hedef_id=hedef_id,
-    #     detay=detay,
-    # )
-    # db.session.add(kayit)
+    db.session.add(IslemKaydi(
+        kullanici_id=kullanici_id,
+        islem_turu=str(islem_turu),
+        hedef_tablo=hedef_tablo,
+        hedef_id=hedef_id,
+        detay=detay,
+        ip_adresi=ip_adresi,
+    ))
