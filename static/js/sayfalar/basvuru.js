@@ -7,7 +7,7 @@ import { girisGerekli } from '../auth.js';
 import { ustMenuyuYerlestir, altBilgiyiYerlestir } from '../layout.js';
 import {
   hataGoster, hataMetni, formHatalariniGoster, formHatalariniTemizle, butonBekle,
-  belirtmeHali, etiket, tarihFormatla
+  belirtmeHali, etiket, tarihFormatla, istegeBagli
 } from '../ui.js';
 import { hayvanOzetSatiri, ekmekKirintisi, sayfaMesaji, kurumAdi } from '../kartlar.js';
 
@@ -111,7 +111,7 @@ function formuCiz(hayvan, kullanici) {
       secimGrubu('ev_tipi', EV_TIPLERI.map((t) => [t, t]))
     ]),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: 'onceki_deneyim' }, ['Daha önce hayvan baktın mı? ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: 'onceki_deneyim' }, ['Daha önce hayvan baktın mı? ', istegeBagli()]),
       el('textarea', {
         id: 'onceki_deneyim', name: 'onceki_deneyim', rows: '3', maxlength: '1000',
         placeholder: 'Ör. 5 yıl boyunca bir kedim oldu. Evde şu an başka hayvan yok.'
@@ -194,7 +194,7 @@ async function gonder(olay, form, hayvan) {
       await apiPost('/api/applications', {
         animal_id: hayvan.id,
         ev_tipi: v.ev_tipi,
-        onceki_deneyim: v.onceki_deneyim || null,
+        onceki_deneyim: v.onceki_deneyim,
         aciklama: v.aciklama,
         kvkk_onay: true
       });

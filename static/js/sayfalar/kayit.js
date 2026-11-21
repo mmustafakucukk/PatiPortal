@@ -4,9 +4,8 @@
 import { apiPost, ApiHatasi } from '../api.js';
 import { mevcutKullanici, girisSonrasiAdres, oturumOnbelleginiTemizle } from '../auth.js';
 import { ustMenuyuYerlestir, altBilgiyiYerlestir } from '../layout.js';
-import { formHatalariniGoster, formHatalariniTemizle, butonBekle, sifreGosterBagla, toast, hataMetni } from '../ui.js';
+import { formHatalariniGoster, formHatalariniTemizle, butonBekle, sifreGosterBagla, toast, hataMetni, epostaGecerliMi, telefonGecerliMi } from '../ui.js';
 
-const EPOSTA_DESENI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SIFRE_MIN = 8;
 const form = document.getElementById('kayit-formu');
 const donus = new URLSearchParams(window.location.search).get('donus');
@@ -40,8 +39,8 @@ kurallariGuncelle();
 function istemciDogrulama(v) {
   const hatalar = {};
   if (v.ad_soyad.length < 2) hatalar.ad_soyad = 'Ad soyad en az 2 karakter olmalı.';
-  if (!EPOSTA_DESENI.test(v.email)) hatalar.email = 'Geçerli bir e-posta adresi girin.';
-  if (v.telefon.replace(/\D/g, '').length < 10) hatalar.telefon = 'Geçerli bir telefon numarası girin (en az 10 rakam).';
+  if (!epostaGecerliMi(v.email)) hatalar.email = 'Geçerli bir e-posta adresi girin.';
+  if (!telefonGecerliMi(v.telefon)) hatalar.telefon = 'Geçerli bir cep telefonu girin (ör. 0555 123 45 67).';
   if (v.sifre.length < SIFRE_MIN) hatalar.sifre = 'Şifre en az 8 karakter olmalı.';
   if (v.sifre !== v.sifre_tekrar) hatalar.sifre_tekrar = 'Şifreler aynı değil.';
   if (!v.kvkk_onay) hatalar.kvkk_onay = 'Devam etmek için KVKK metnini onaylamalısın.';

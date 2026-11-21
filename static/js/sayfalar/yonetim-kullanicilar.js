@@ -9,7 +9,7 @@ import { apiGet, apiPost, apiPut, apiDelete, ApiHatasi } from '../api.js';
 import { yonetimSayfasi, islemMenusu } from '../yonetim.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
-  formHatalariniGoster, formHatalariniTemizle, etiket, etiketRozeti, debounce, sayiFormatla, tarihFormatla
+  formHatalariniGoster, formHatalariniTemizle, etiket, etiketRozeti, debounce, sayiFormatla, tarihFormatla, epostaGecerliMi, telefonGecerliMi, istegeBagli
 } from '../ui.js';
 
 const ROLLER = ['ziyaretci', 'gorevli', 'admin'];
@@ -18,7 +18,6 @@ const ROL_ACIKLAMALARI = {
   gorevli: 'Atandığı kurumların panelini kullanır.',
   admin: 'Tüm kurumları ve sistem yönetimini kullanır.'
 };
-const EPOSTA_DESENI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const form = document.getElementById('filtre');
 const liste = document.getElementById('kullanici-listesi');
@@ -227,7 +226,7 @@ async function kurumAtamaAc(k) {
       ])))
     ]),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-gorev` }, ['Yeni atamalarda görev tanımı ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-gorev` }, ['Yeni atamalarda görev tanımı ', istegeBagli()]),
       el('input', { id: `${formId}-gorev`, name: 'gorev_tanimi', type: 'text', maxlength: '50', placeholder: 'Ör. Veteriner hekim' })
     ])
   ]);
@@ -281,7 +280,7 @@ async function yeniKullaniciAc() {
   const formId = 'yeni-kullanici';
   const tumKurumlar = await kurumlar().catch(() => []);
   const kurumAlani = el('div', { class: 'form-alan' }, [
-    el('label', { for: `${formId}-kurum` }, ['Kuruma ata ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+    el('label', { for: `${formId}-kurum` }, ['Kuruma ata ', istegeBagli()]),
     el('select', { id: `${formId}-kurum`, name: 'kurum_id' }, [
       el('option', { value: '', text: 'Şimdi atama' }),
       ...tumKurumlar.filter((x) => x.aktif !== false).map((x) => el('option', { value: x.id, text: x.ad }))
@@ -331,8 +330,8 @@ async function yeniKullaniciAc() {
     };
     const hatalar = {};
     if (govde.ad_soyad.length < 2) hatalar.ad_soyad = 'Ad soyad en az 2 karakter olmalı.';
-    if (!EPOSTA_DESENI.test(govde.email)) hatalar.email = 'Geçerli bir e-posta adresi gir.';
-    if (govde.telefon.replace(/\D/g, '').length < 10) hatalar.telefon = 'Geçerli bir telefon numarası gir.';
+    if (!epostaGecerliMi(govde.email)) hatalar.email = 'Geçerli bir e-posta adresi gir.';
+    if (!telefonGecerliMi(govde.telefon)) hatalar.telefon = 'Geçerli bir cep telefonu gir (ör. 0555 123 45 67).';
     if (govde.sifre.length < 8) hatalar.sifre = 'Şifre en az 8 karakter olmalı.';
     if (Object.keys(hatalar).length) {
       formHatalariniGoster(yf, hatalar);

@@ -47,7 +47,7 @@
   --kart: #FFFFFF;
   --metin: #1E2523;
   --metin-ikincil: #4F5856;
-  --metin-soluk: #6B7371;     /* yer tutucu metin (beyaz üzerinde 4.9:1) */
+  --metin-soluk: #646B69;     /* yer tutucu metin (beyaz 5.4:1, zemin-koyu 4.8:1) */
   --cizgi: #E7E1D8;
   --kenarlik: #D9D1C5;
   --kenarlik-hover: #BFB4A4;
@@ -215,6 +215,29 @@ hr {
 
 
 /* 3. Yardımcı sınıflar ----------------------------------------------------- */
+/* "İçeriğe geç": yalnızca klavyeyle odaklanınca görünür */
+.atla-baglanti {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--renk-ana);
+  color: #fff;
+  border-radius: var(--r-kontrol);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.atla-baglanti:focus {
+  transform: none;
+  outline-color: #fff;
+}
+
+main:focus {
+  outline: none;
+}
+
 
 /* Ekranda görünmez, ekran okuyucuda okunur */
 .gizli-erisim {
@@ -235,8 +258,6 @@ hr {
 .yalniz-genis { display: none; }
 @media (min-width: 1024px) { .yalniz-genis { display: inline; } }
 .metin-kucuk { font-size: 14px; }
-.metin-acil { color: var(--acil); }
-.metin-ortala { text-align: center; }
 
 /* Satır içi SVG ikonlar: çizgi stili, 1.8 kalınlık */
 .ikon {
@@ -2808,12 +2829,6 @@ input[readonly] {
   border-radius: 0;
 }
 
-.iskelet-daire {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-
 .iskelet-kare {
   width: 48px;
   height: 48px;
@@ -3344,7 +3359,7 @@ input[readonly] {
   height: 150px;
   overflow: hidden;
   border-radius: var(--r-kart);
-  color: rgba(30, 37, 35, 0.62);
+  color: rgba(30, 37, 35, 0.78);
   font-size: 13px;
 }
 

@@ -118,6 +118,20 @@ export function bosDurumGoster(kap, mesaj, link = null) {
 }
 
 // -----------------------------------------------------------------------------
+// Ortak doğrulama ve form parçaları
+// -----------------------------------------------------------------------------
+export const EPOSTA_DESENI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** E-posta biçimi geçerli mi (backend ayrıca doğrular). */
+export const epostaGecerliMi = (deger) => EPOSTA_DESENI.test(String(deger || '').trim());
+
+/** Cep telefonu biçimi (backend ile aynı kural: 05xx xxx xx xx, +905…, 5…). */
+export const telefonGecerliMi = (deger) => /^(\+90|0)?5\d{9}$/.test(String(deger || '').replace(/[\s\-()]/g, ''));
+
+/** Etiketlerin yanındaki "(isteğe bağlı)" notu. */
+export const istegeBagli = () => el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' });
+
+// -----------------------------------------------------------------------------
 // Form hataları
 // -----------------------------------------------------------------------------
 let hataSayaci = 0;

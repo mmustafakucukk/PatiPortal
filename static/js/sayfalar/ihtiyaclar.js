@@ -8,7 +8,7 @@ import { mevcutKullanici } from '../auth.js';
 import { ustMenuyuYerlestir, altBilgiyiYerlestir } from '../layout.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, modalAc, toast,
-  formHatalariniGoster, formHatalariniTemizle, butonBekle, ihtiyacOranlari, sayiFormatla, etiket
+  formHatalariniGoster, formHatalariniTemizle, butonBekle, ihtiyacOranlari, sayiFormatla, etiket, telefonGecerliMi, istegeBagli
 } from '../ui.js';
 import { ihtiyacKarti } from '../kartlar.js';
 
@@ -180,7 +180,7 @@ async function destekModaliAc(ihtiyac) {
       el('p', { class: 'form-yardim', id: `${formId}-telefon-yardim`, text: 'Kurum teslim için seninle bu numaradan iletişime geçer.' })
     ]),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-not` }, ['Not ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-not` }, ['Not ', istegeBagli()]),
       el('textarea', { id: `${formId}-not`, name: 'aciklama', maxlength: '500', rows: '3', placeholder: 'Ör. Cumartesi öğleden önce getirebilirim.' })
     ]),
     el('div', { class: 'form-alan' }, [
@@ -220,7 +220,7 @@ async function destekModaliAc(ihtiyac) {
     else if (tamSayi && !Number.isInteger(miktar)) hatalar.miktar = `Miktar tam sayı olmalı (${birim}).`;
     else if (miktar > o.kalan) hatalar.miktar = `En fazla ${sayiFormatla(o.kalan)} ${birim} söz verebilirsin.`;
     if (adSoyad.length < 2) hatalar.ad_soyad = 'Adını ve soyadını gir.';
-    if (telefon.replace(/\D/g, '').length < 10) hatalar.telefon = 'Geçerli bir telefon numarası gir.';
+    if (!telefonGecerliMi(telefon)) hatalar.telefon = 'Geçerli bir cep telefonu gir (ör. 0555 123 45 67).';
     if (!f.kvkk_onay.checked) hatalar.kvkk_onay = 'Devam etmek için KVKK metnini onaylamalısın.';
     if (Object.keys(hatalar).length) {
       formHatalariniGoster(destekFormu, hatalar);

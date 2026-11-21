@@ -8,6 +8,16 @@ import { kurumSeciciyiYerlestir } from './kurum.js';
 import { cekmeceAc, toast } from './ui.js';
 
 // -----------------------------------------------------------------------------
+// "İçeriğe geç" bağlantısı (klavye kullanıcıları menüyü atlayabilsin)
+// -----------------------------------------------------------------------------
+function atlamaBaglantisiEkle() {
+  const ana = document.getElementById('icerik');
+  if (!ana || document.querySelector('.atla-baglanti')) return;
+  if (!ana.hasAttribute('tabindex')) ana.setAttribute('tabindex', '-1');
+  document.body.prepend(el('a', { class: 'atla-baglanti', href: '#icerik', text: 'İçeriğe geç' }));
+}
+
+// -----------------------------------------------------------------------------
 // Panel üst alanları (her ikisinde de kurum seçici bulunur)
 // -----------------------------------------------------------------------------
 
@@ -16,6 +26,7 @@ import { cekmeceAc, toast } from './ui.js';
  *   panelSelamAlaniniYerlestir(kullanici)   → #ust-menu kabına
  */
 export async function panelSelamAlaniniYerlestir(kullanici, kap = null) {
+  if (!kap) atlamaBaglantisiEkle();
   const hedef = kap || document.getElementById('ust-menu');
   if (!hedef) return;
   const secici = el('div');
@@ -38,6 +49,7 @@ export async function panelSelamAlaniniYerlestir(kullanici, kap = null) {
  *   panelUstCubugunuYerlestir({ baslik: 'Yeni hayvan', geri: '/panel/index.html', ek: '~30 sn' })
  */
 export async function panelUstCubugunuYerlestir({ baslik, geri = '/panel/index.html', ek = null, kap = null } = {}) {
+  if (!kap) atlamaBaglantisiEkle();
   const hedef = kap || document.getElementById('ust-menu');
   if (!hedef) return;
   const secici = el('div');
@@ -96,6 +108,7 @@ function linkOlustur(link, aktif, sinif) {
  *   ustMenuyuYerlestir({ acilBant: false }) → bandsız
  */
 export async function ustMenuyuYerlestir({ acilBant = true, kap = null } = {}) {
+  if (!kap) atlamaBaglantisiEkle();
   let hedef = kap || document.getElementById('ust-menu');
   if (!hedef) {
     hedef = el('div', { id: 'ust-menu' });
@@ -142,7 +155,7 @@ export async function ustMenuyuYerlestir({ acilBant = true, kap = null } = {}) {
   // Kullanıcı durumu belli olana kadar ziyaretçi menüsü gösterilir
   const ciz = (kullanici) => {
     const linkler = [...GENEL_LINKLER];
-    if (gorevliMi(kullanici)) linkler.push({ anahtar: 'panel', metin: 'Panel', href: '/panel/index.html' });
+    if (gorevliMi(kullanici) || sistemYoneticisiMi(kullanici)) linkler.push({ anahtar: 'panel', metin: 'Panel', href: '/panel/index.html' });
     if (sistemYoneticisiMi(kullanici)) linkler.push({ anahtar: 'yonetim', metin: 'Yönetim', href: '/yonetim/index.html' });
 
     icerikDegistir(masaustuListe, linkler.map((l) => el('li', {}, [linkOlustur(l, aktif, 'ust-menu-link')])));

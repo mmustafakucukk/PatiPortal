@@ -9,7 +9,7 @@ import { apiGet, apiPut, apiPost, ApiHatasi } from '../api.js';
 import { panelSayfasi } from '../panel.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
-  formHatalariniGoster, etiket, etiketRozeti, kisaTarih, tarihFormatla, saatFormatla
+  formHatalariniGoster, etiket, etiketRozeti, kisaTarih, tarihFormatla, saatFormatla, istegeBagli
 } from '../ui.js';
 import { FOTOGRAF_YOK, kapakUrl } from '../kartlar.js';
 
@@ -241,7 +241,7 @@ function reddetAc(b) {
   const form = el('form', { id: formId, novalidate: true }, [
     el('p', { text: `${b.basvuran?.ad_soyad || 'Başvuranın'} ${b.hayvan?.ad || 'hayvan'} için yaptığı başvuru reddedilecek.` }),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-not` }, ['Başvurana not ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-not` }, ['Başvurana not ', istegeBagli()]),
       el('textarea', { id: `${formId}-not`, name: 'degerlendirme_notu', rows: '3', maxlength: '1000', placeholder: 'Ör. Bahçeli bir ev ihtiyacı var.', 'aria-describedby': `${formId}-yardim` }),
       el('p', { class: 'form-yardim', id: `${formId}-yardim`, text: 'Başvuran bu notu Hesabım sayfasında görür. Kibar ve kısa tut.' })
     ])
@@ -274,7 +274,7 @@ function teslimAc(b) {
   const form = el('form', { id: formId, novalidate: true }, [
     el('p', { text: `${b.hayvan?.ad || 'Hayvan'}, ${b.basvuran?.ad_soyad || 'başvurana'} teslim edilecek. Kimliğini kontrol etmeyi unutma.` }),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-not` }, ['Teslim notu ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-not` }, ['Teslim notu ', istegeBagli()]),
       el('textarea', { id: `${formId}-not`, name: 'teslim_notu', rows: '2', maxlength: '1000', placeholder: 'Ör. Mama ve kum örneğiyle birlikte teslim edildi.' })
     ])
   ]);
@@ -286,7 +286,7 @@ function teslimAc(b) {
     olay.preventDefault();
     await butonBekle(onayla, async () => {
       try {
-        await apiPost('/api/adoptions/complete', { application_id: b.id, teslim_notu: form.elements.teslim_notu.value.trim() || null });
+        await apiPost('/api/adoptions/complete', { application_id: b.id, teslim_notu: form.elements.teslim_notu.value.trim() });
         teslimEdilenler.add(b.id);
         modal.kapat();
         toast(`${b.hayvan?.ad || 'Hayvan'} teslim edildi. Yeni yuvasında mutlu olsun!`, 'basari', 6000);

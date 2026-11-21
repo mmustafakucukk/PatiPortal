@@ -14,7 +14,7 @@ import { apiGet, apiPost, apiPut, ApiHatasi } from '../api.js';
 import { yonetimSayfasi } from '../yonetim.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
-  formHatalariniGoster, formHatalariniTemizle
+  formHatalariniGoster, formHatalariniTemizle, istegeBagli
 } from '../ui.js';
 
 const tabloKabi = document.getElementById('gereklilik-tablosu');
@@ -260,7 +260,7 @@ function asiTuruEkleAc() {
       el('input', { id: `${formId}-ad`, name: 'ad', type: 'text', maxlength: '50', autocomplete: 'off', required: true, placeholder: 'Ör. Lösemi' })
     ]),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-aciklama` }, ['Açıklama ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-aciklama` }, ['Açıklama ', istegeBagli()]),
       el('textarea', { id: `${formId}-aciklama`, name: 'aciklama', rows: '2', maxlength: '500', placeholder: 'Ör. Yıllık tekrarlanır.' })
     ]),
     el('p', { class: 'form-yardim', text: 'Eklenen aşı tabloya yeni satır olarak gelir; hangi türlerde zorunlu olacağını oradan işaretle.' })

@@ -9,10 +9,9 @@ import { apiGet, apiPost, apiPut, apiDelete, ApiHatasi } from '../api.js';
 import { yonetimSayfasi, islemMenusu } from '../yonetim.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
-  formHatalariniGoster, formHatalariniTemizle, etiketRozeti, debounce, sayiFormatla, tarihFormatla
+  formHatalariniGoster, formHatalariniTemizle, etiketRozeti, debounce, sayiFormatla, tarihFormatla, epostaGecerliMi, istegeBagli
 } from '../ui.js';
 
-const EPOSTA_DESENI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const form = document.getElementById('filtre');
 const liste = document.getElementById('kurum-listesi');
 const sonucSayisi = document.getElementById('sonuc-sayisi');
@@ -117,7 +116,7 @@ function alan(id, etiketMetni, girdi, yardim = null) {
 
 function kurumFormuAc(k) {
   const formId = `kurum-formu-${k?.id || 'yeni'}`;
-  const istegeBagli = (m) => [m, ' ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })];
+  const istegeBagli = (m) => [m, ' ', istegeBagli()];
   const kf = el('form', { id: formId, novalidate: true }, [
     alan(`${formId}-ad`, 'Kurum adı', el('input', { id: `${formId}-ad`, name: 'ad', type: 'text', maxlength: '150', required: true, value: k?.ad || '', autocomplete: 'off' })),
     el('fieldset', { class: 'form-alan' }, [
@@ -153,7 +152,7 @@ function kurumFormuAc(k) {
     if (govde.ad.length < 2) hatalar.ad = 'Kurum adı en az 2 karakter olmalı.';
     if (govde.adres && govde.adres.length < 5) hatalar.adres = 'Adres en az 5 karakter olmalı.';
     if (govde.telefon && govde.telefon.replace(/\D/g, '').length < 7) hatalar.telefon = 'Geçerli bir telefon numarası gir.';
-    if (govde.email && !EPOSTA_DESENI.test(govde.email)) hatalar.email = 'Geçerli bir e-posta adresi gir.';
+    if (govde.email && !epostaGecerliMi(govde.email)) hatalar.email = 'Geçerli bir e-posta adresi gir.';
     if (Object.keys(hatalar).length) {
       formHatalariniGoster(kf, hatalar);
       return;
@@ -264,7 +263,7 @@ function gorevlileriAc(k) {
           el('option', { value: '', text: 'Kişi seç' }),
           ...uygun.map((u) => el('option', { value: u.id, text: `${u.ad_soyad} (${u.email})` }))
         ])),
-        alan(`${formId}-gorev`, ['Görev tanımı ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })],
+        alan(`${formId}-gorev`, ['Görev tanımı ', istegeBagli()],
           el('input', { id: `${formId}-gorev`, name: 'gorev_tanimi', type: 'text', maxlength: '50', placeholder: 'Ör. Veteriner hekim' }))
       ]),
       yardim,

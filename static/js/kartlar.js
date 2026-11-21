@@ -237,3 +237,27 @@ export function ekmekKirintisi(parcalar) {
     ])))
   ]);
 }
+
+/** Uyarı kutusu: uyariKutusu('basari', 'onay', 'Başlık', 'Açıklama') */
+export function uyariKutusu(tur, ikonAdi, baslik, metin) {
+  return el('div', { class: `uyari-kutusu uyari-kutusu-${tur}` }, [
+    ikon(ikonAdi),
+    el('div', { class: 'uyari-kutusu-metin' }, [baslik && el('strong', { text: baslik }), metin && el('p', { text: metin })])
+  ]);
+}
+
+/**
+ * API randevusunu düzleştirir: teslim saatinin tarih/saat alanları üst düzeye taşınır.
+ *   { ...randevu, saat_id, tarih, baslangic_saati, bitis_saati, kurum_id }
+ */
+export function randevuOzeti(r) {
+  if (!r) return null;
+  return {
+    ...r,
+    saat_id: r.teslim_saati_id,
+    tarih: r.teslim_saati?.tarih,
+    baslangic_saati: r.teslim_saati?.baslangic_saati,
+    bitis_saati: r.teslim_saati?.bitis_saati,
+    kurum_id: r.teslim_saati?.kurum_id ?? r.hayvan?.kurum?.id
+  };
+}

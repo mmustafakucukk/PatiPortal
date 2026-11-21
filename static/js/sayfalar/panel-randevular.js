@@ -10,7 +10,7 @@ import { apiGet, apiPost, apiPut } from '../api.js';
 import { panelSayfasi } from '../panel.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
-  formHatalariniGoster, etiketRozeti, saatFormatla, tarihFormatla, gunAdi, goreceliGun, bugunIso, gunEkle
+  formHatalariniGoster, etiketRozeti, saatFormatla, tarihFormatla, gunAdi, goreceliGun, bugunIso, gunEkle, istegeBagli
 } from '../ui.js';
 import { hayvanOzetSatiri } from '../kartlar.js';
 
@@ -112,7 +112,7 @@ function teslimAc(r) {
       el('div', { class: 'uyari-kutusu-metin' }, [el('p', { text: 'Kimliği kontrol et. Teslimden sonra sahiplendirme kaydı oluşur ve randevu tamamlanır.' })])
     ]),
     el('div', { class: 'form-alan' }, [
-      el('label', { for: `${formId}-not` }, ['Teslim notu ', el('span', { class: 'istege-bagli', text: '(isteğe bağlı)' })]),
+      el('label', { for: `${formId}-not` }, ['Teslim notu ', istegeBagli()]),
       el('textarea', { id: `${formId}-not`, name: 'teslim_notu', rows: '2', maxlength: '1000', placeholder: 'Ör. Mama ve kum örneğiyle birlikte teslim edildi.' })
     ])
   ]);
@@ -124,7 +124,7 @@ function teslimAc(r) {
     olay.preventDefault();
     await butonBekle(onayla, async () => {
       try {
-        await apiPost('/api/adoptions/complete', { application_id: r.basvuru_id, teslim_notu: form.elements.teslim_notu.value.trim() || null });
+        await apiPost('/api/adoptions/complete', { application_id: r.basvuru_id, teslim_notu: form.elements.teslim_notu.value.trim() });
         modal.kapat();
         toast(`${r.hayvan?.ad || 'Hayvan'} teslim edildi. Yeni yuvasında mutlu olsun!`, 'basari', 6000);
         yukle();

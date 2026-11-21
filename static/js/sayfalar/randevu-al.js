@@ -12,7 +12,7 @@ import {
   hataGoster, hataMetni, toast, onayIste, butonBekle, bugunIso, gunEkle, tarihFormatla,
   saatFormatla, gunAdi, tarihNesnesi, etiket
 } from '../ui.js';
-import { hayvanOzetSatiri, ekmekKirintisi, sayfaMesaji } from '../kartlar.js';
+import { hayvanOzetSatiri, ekmekKirintisi, sayfaMesaji, randevuOzeti } from '../kartlar.js';
 
 const GUN_SAYISI = 14;
 const AYLAR_KISA = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
@@ -99,17 +99,6 @@ async function yukle() {
   else saatSeciciGoster(basvuru);
 }
 
-/** API randevusunu düz biçime çevirir: { id, durum, tarih, baslangic_saati, bitis_saati, saat_id }. */
-function randevuOzeti(r) {
-  if (!r) return null;
-  return {
-    id: r.id, durum: r.durum, basvuru_id: r.basvuru_id,
-    saat_id: r.teslim_saati_id,
-    tarih: r.teslim_saati?.tarih,
-    baslangic_saati: r.teslim_saati?.baslangic_saati,
-    bitis_saati: r.teslim_saati?.bitis_saati
-  };
-}
 
 // -----------------------------------------------------------------------------
 // Bekleyen randevu

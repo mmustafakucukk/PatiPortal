@@ -10,7 +10,7 @@ import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, butonBekle,
   etiket, etiketRozeti, tarihFormatla, saatFormatla, kisaTarih, gunAdi, bugunIso, gunFarki, sayiFormatla
 } from '../ui.js';
-import { hayvanOzetSatiri, asiKarnesiTablosu, dikkatGerekenAsilar } from '../kartlar.js';
+import { hayvanOzetSatiri, asiKarnesiTablosu, dikkatGerekenAsilar, uyariKutusu, randevuOzeti } from '../kartlar.js';
 import { kullaniciKurumlari } from '../kurum.js';
 
 // Backend'de uç noktası olmayan işlemler. Eklendiğinde ilgili düğmeler buradan açılır.
@@ -100,16 +100,6 @@ function sekmeleriYenile(...adlar) {
 
 const panel = (ad) => document.getElementById(`panel-${ad}`);
 
-/** API randevusunu düz biçime çevirir: { id, durum, basvuru_id, tarih, baslangic_saati, hayvan, kurum_id }. */
-function randevuOzeti(r) {
-  return {
-    ...r,
-    tarih: r.teslim_saati?.tarih,
-    baslangic_saati: r.teslim_saati?.baslangic_saati,
-    bitis_saati: r.teslim_saati?.bitis_saati,
-    kurum_id: r.teslim_saati?.kurum_id ?? r.hayvan?.kurum?.id
-  };
-}
 
 /** Kurum adresleri (randevu kartında gösterilir); yüklenemezse boş kalır. */
 let kurumlarSozu = null;
@@ -123,12 +113,6 @@ function kurumHaritasi() {
 }
 const randevuMetni = (r) => `${tarihFormatla(r.tarih)} ${gunAdi(r.tarih)}, ${saatFormatla(r.baslangic_saati)}`;
 
-function uyariKutusu(tur, ikonAdi, baslik, metin) {
-  return el('div', { class: `uyari-kutusu uyari-kutusu-${tur}` }, [
-    ikon(ikonAdi),
-    el('div', { class: 'uyari-kutusu-metin' }, [baslik && el('strong', { text: baslik }), metin && el('p', { text: metin })])
-  ]);
-}
 
 // -----------------------------------------------------------------------------
 // Başvurularım

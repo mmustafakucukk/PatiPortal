@@ -6,7 +6,7 @@
 // =============================================================================
 
 // 401 alınca giriş sayfasına yönlendirilmeyecek yollar
-const YONLENDIRMESIZ_YOLLAR = ['/api/auth/me', '/api/auth/login', '/api/auth/register'];
+const YONLENDIRMESIZ_YOLLAR = ['/api/auth/me', '/api/auth/login', '/api/auth/register', '/api/auth/logout'];
 
 // -----------------------------------------------------------------------------
 // Hata sınıfı

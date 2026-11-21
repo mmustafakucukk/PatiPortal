@@ -4,9 +4,8 @@
 import { apiPost, ApiHatasi } from '../api.js';
 import { mevcutKullanici, girisSonrasiAdres, oturumOnbelleginiTemizle } from '../auth.js';
 import { ustMenuyuYerlestir, altBilgiyiYerlestir } from '../layout.js';
-import { formHatalariniGoster, formHatalariniTemizle, butonBekle, sifreGosterBagla, toast, hataMetni } from '../ui.js';
+import { formHatalariniGoster, formHatalariniTemizle, butonBekle, sifreGosterBagla, toast, hataMetni, epostaGecerliMi } from '../ui.js';
 
-const EPOSTA_DESENI = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const form = document.getElementById('giris-formu');
 const donus = new URLSearchParams(window.location.search).get('donus');
 
@@ -33,7 +32,7 @@ form.addEventListener('submit', async (olay) => {
 
   const hatalar = {};
   if (!email) hatalar.email = 'E-posta adresinizi girin.';
-  else if (!EPOSTA_DESENI.test(email)) hatalar.email = 'Geçerli bir e-posta adresi girin.';
+  else if (!epostaGecerliMi(email)) hatalar.email = 'Geçerli bir e-posta adresi girin.';
   if (!sifre) hatalar.sifre = 'Şifrenizi girin.';
   if (Object.keys(hatalar).length) {
     formHatalariniGoster(form, hatalar);
