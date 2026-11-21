@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PatiPortal – Barınak ve kliniklerden hayvan sahiplen</title>
+  <meta name="description" content="Barınak ve kliniklerdeki kedi ve köpekleri tanı, aşı durumlarını gör, sahiplenme başvurusu yap ve acil ihtiyaçlara destek ol.">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="ust-menu"></div>
+
+<main id="icerik">
+  <section class="giris" aria-labelledby="giris-baslik">
+    <div class="konteyner giris-ic">
+      <div>
+        <p class="ust-baslik">PatiPortal · Barınak ve klinikler bir arada</p>
+        <h1 id="giris-baslik">Bir dost sahiplen,<br>bir hayata ortak ol.</h1>
+        <p class="giris-aciklama">Barınak ve kliniklerdeki kedi ve köpekleri tanı, aşı durumlarını gör ve tek formla sahiplenme başvurusu yap. Acil mama ve ilaç ihtiyaçlarına da buradan destek olabilirsin.</p>
+        <div class="satir">
+          <a class="btn btn-ana" href="/hayvanlar.html">Hayvanları gör</a>
+          <a class="btn btn-cerceve" href="/ihtiyaclar.html">İhtiyaçlara destek ol</a>
+        </div>
+      </div>
+      <div class="giris-gorseller" aria-hidden="true">
+        <div class="giris-gorsel" style="background:var(--yer-1)">
+          <svg class="ikon" viewBox="0 0 24 24"><circle cx="6.5" cy="10" r="1.9"/><circle cx="9.5" cy="5.8" r="1.9"/><circle cx="14.5" cy="5.8" r="1.9"/><circle cx="17.5" cy="10" r="1.9"/><path d="M12 12.2c-2.3 0-3.7 1.8-4.8 3.5-1 1.6-.8 3.6 1 4.1 1.3.4 2.4-.3 3.8-.3s2.5.7 3.8.3c1.8-.5 2-2.5 1-4.1-1.1-1.7-2.5-3.5-4.8-3.5z"/></svg>
+          <span>Kediler</span>
+        </div>
+        <div class="giris-gorsel" style="background:var(--yer-2)">
+          <svg class="ikon" viewBox="0 0 24 24"><circle cx="6.5" cy="10" r="1.9"/><circle cx="9.5" cy="5.8" r="1.9"/><circle cx="14.5" cy="5.8" r="1.9"/><circle cx="17.5" cy="10" r="1.9"/><path d="M12 12.2c-2.3 0-3.7 1.8-4.8 3.5-1 1.6-.8 3.6 1 4.1 1.3.4 2.4-.3 3.8-.3s2.5.7 3.8.3c1.8-.5 2-2.5 1-4.1-1.1-1.7-2.5-3.5-4.8-3.5z"/></svg>
+          <span>Köpekler</span>
+        </div>
+        <div class="giris-gorsel" style="background:var(--yer-3);color:#7A6223">
+          <svg class="ikon" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-4.5L19 8v13M10 21v-4h4v4M9 10.5h.01M15 10.5h.01M9 14h.01M15 14h.01"/></svg>
+          <span>Barınaklar</span>
+        </div>
+        <div class="giris-gorsel" style="background:var(--yer-4);color:#5E5470">
+          <svg class="ikon" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9.3-9.2C1.5 7.5 3.8 4.5 7 4.5c2 0 3.3 1.1 5 3 1.7-1.9 3-3 5-3 3.2 0 5.5 3 4.3 6.3C19.5 15.4 12 20 12 20z"/></svg>
+          <span>Gönüllüler</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="konteyner" aria-label="Sayılarla PatiPortal" style="padding-block:16px 8px">
+    <ul class="sayac-karti" id="sayaclar" aria-live="polite"></ul>
+  </section>
+
+  <section class="bolum" aria-labelledby="hayvanlar-baslik">
+    <div class="konteyner">
+      <div class="bolum-baslik">
+        <div>
+          <h2 id="hayvanlar-baslik">Yuva arayan dostlarımız</h2>
+          <p>Her birinin aşı karnesi ve sağlık bilgisi profilinde.</p>
+        </div>
+        <a class="baglanti" href="/hayvanlar.html" id="tumunu-gor">Tümünü gör</a>
+      </div>
+      <div class="izgara" id="one-cikanlar"></div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-beyaz" aria-labelledby="ihtiyaclar-baslik">
+    <div class="konteyner">
+      <div class="bolum-baslik">
+        <div>
+          <h2 id="ihtiyaclar-baslik">Acil ihtiyaçlar</h2>
+          <p>Söz verdiğinde kurum görevlisi seninle iletişime geçer.</p>
+        </div>
+        <a class="baglanti" href="/ihtiyaclar.html">Tüm ihtiyaçlar</a>
+      </div>
+      <div class="izgara izgara-genis" id="acil-ihtiyaclar"></div>
+    </div>
+  </section>
+
+  <section class="bolum" id="nasil" aria-labelledby="nasil-baslik" style="scroll-margin-top:var(--ust-menu-yukseklik)">
+    <div class="konteyner">
+      <h2 id="nasil-baslik" style="margin-bottom:28px">Nasıl sahiplenirim?</h2>
+      <ol class="adimlar">
+        <li>
+          <span class="adim-no" aria-hidden="true">1</span>
+          <h3>Dostunu seç</h3>
+          <p>Tür, yaş ve aşı durumuna göre filtrele, profilini ve aşı karnesini incele.</p>
+        </li>
+        <li>
+          <span class="adim-no" aria-hidden="true">2</span>
+          <h3>Başvuru formunu doldur</h3>
+          <p>Birkaç soruyla kendini ve evini tanıt. Bilgilerin KVKK kapsamında korunur.</p>
+        </li>
+        <li>
+          <span class="adim-no" aria-hidden="true">3</span>
+          <h3>Onaylanınca randevu al</h3>
+          <p>Görevli başvurunu onaylayınca hesabından uygun bir teslim alma saati seç.</p>
+        </li>
+        <li>
+          <span class="adim-no" aria-hidden="true">4</span>
+          <h3>Teslim al</h3>
+          <p>Randevu saatinde kimliğinle kuruma git, yeni dostunu aşı karnesiyle birlikte teslim al.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<div id="alt-bilgi"></div>
+<script type="module" src="/static/js/sayfalar/anasayfa.js"></script>
+</body>
+</html>
