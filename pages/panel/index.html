@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1F5F5B">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde">
+  <div class="sayac-izgara" id="sayaclar" aria-live="polite"></div>
+  <div id="gecikmis-asilar" class="panel-bolum" hidden></div>
+
+  <a class="btn btn-ana btn-buyuk btn-blok panel-bolum" href="/panel/hayvan-ekle.html">
+    <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    Hayvan Ekle
+  </a>
+  <div class="btn-grup" style="margin-top:12px">
+    <a class="btn btn-cerceve btn-buyuk" href="/panel/asi.html">Aşı gir</a>
+    <a class="btn btn-cerceve btn-buyuk" href="/panel/ihtiyaclar.html#yeni">İhtiyaç ekle</a>
+  </div>
+
+  <section class="kart panel-bolum" aria-labelledby="teslim-baslik">
+    <div class="kart-baslik">
+      <h2 id="teslim-baslik">Bugünkü teslimler</h2>
+      <a class="baglanti" href="/panel/randevular.html">Tümü</a>
+    </div>
+    <div id="bugunku-teslimler"></div>
+  </section>
+
+  <section class="kart panel-bolum" aria-labelledby="asi-baslik">
+    <div class="kart-baslik">
+      <h2 id="asi-baslik">Bu hafta yapılacak aşılar</h2>
+      <a class="baglanti" href="/panel/asi.html">Aşı gir</a>
+    </div>
+    <div id="haftalik-asilar"></div>
+  </section>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-ana.js"></script>
+</body>
+</html>

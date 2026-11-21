@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aşı gir – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde">
+  <div id="sonuc" aria-live="polite"></div>
+
+  <form id="asi-formu" class="form-buyuk" novalidate>
+    <section class="kart" aria-labelledby="hayvan-baslik">
+      <h2 id="hayvan-baslik" style="font-size:20px">Hayvan</h2>
+      <div class="form-alan" id="hayvan-arama-alani">
+        <label for="hayvan-ara">Hayvan ara</label>
+        <div class="oneri-kap">
+          <div class="girdi-grubu girdi-grubu-sol">
+            <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="hayvan-ara" name="hayvan_ara" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="hayvan-onerileri" autocomplete="off" placeholder="Adını yazmaya başla…">
+          </div>
+          <ul class="oneri-listesi" id="hayvan-onerileri" role="listbox" aria-label="Hayvan önerileri" hidden></ul>
+        </div>
+        <input type="hidden" name="hayvan_id">
+      </div>
+      <div id="secilen-hayvan" hidden></div>
+      <div id="zorunlu-asilar" style="margin-top:12px" hidden></div>
+    </section>
+
+    <section class="kart panel-bolum" aria-labelledby="asi-bilgi-baslik">
+      <h2 id="asi-bilgi-baslik" style="font-size:20px">Aşı bilgisi</h2>
+      <div class="form-alan">
+        <label for="asi_turu_id">Aşı türü</label>
+        <select id="asi_turu_id" name="asi_turu_id" required><option value="">Aşı türü seçin</option></select>
+      </div>
+      <div class="form-satir">
+        <div class="form-alan">
+          <label for="uygulama_tarihi">Yapılma tarihi</label>
+          <input id="uygulama_tarihi" name="uygulama_tarihi" type="date" required>
+        </div>
+        <div class="form-alan">
+          <label for="sonraki_tarih">Sonraki doz <span class="istege-bagli">(isteğe bağlı)</span></label>
+          <input id="sonraki_tarih" name="sonraki_tarih" type="date" aria-describedby="sonraki-yardim">
+          <p class="form-yardim" id="sonraki-yardim">Tekrar dozu gerekiyorsa tarihini gir; yaklaşınca panelde hatırlatılır.</p>
+        </div>
+      </div>
+      <div class="form-alan">
+        <label for="uygulayan_kurum_id">Uygulayan kurum</label>
+        <select id="uygulayan_kurum_id" name="uygulayan_kurum_id"><option value="">Belirtilmedi</option></select>
+      </div>
+      <div class="form-alan">
+        <span class="form-etiket" id="belge-etiket">Belge <span class="istege-bagli">(PDF veya fotoğraf, isteğe bağlı)</span></span>
+        <div id="belge-alani">
+          <label class="dosya-sec">
+            <input type="file" name="belge" accept="application/pdf,image/jpeg,image/png,image/webp" aria-labelledby="belge-etiket">
+            <span class="btn btn-cerceve" aria-hidden="true">
+              <svg class="ikon" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+              Belge seç
+            </span>
+          </label>
+        </div>
+        <div class="secilen-dosya" id="secilen-belge" hidden></div>
+      </div>
+      <div class="form-alan">
+        <label for="aciklama">Not <span class="istege-bagli">(isteğe bağlı)</span></label>
+        <textarea id="aciklama" name="aciklama" rows="2" maxlength="500" placeholder="Ör. Seri no, yan etki gözlemi"></textarea>
+      </div>
+      <div class="alt-eylem">
+        <button class="btn btn-ana btn-buyuk btn-blok" type="submit">Aşıyı kaydet</button>
+      </div>
+    </section>
+  </form>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-asi.js"></script>
+</body>
+</html>

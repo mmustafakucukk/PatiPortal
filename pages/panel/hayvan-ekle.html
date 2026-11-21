@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Yeni hayvan – Görevli paneli – PatiPortal</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="panel-sayfa">
+<div id="ust-menu"></div>
+
+<main id="icerik" class="panel-govde panel-govde-menusuz">
+  <div id="sonuc" aria-live="polite"></div>
+
+  <form id="hayvan-formu" class="form-buyuk" novalidate>
+    <div class="form-alan">
+      <label class="foto-yukle" id="foto-alani">
+        <input type="file" name="fotograf_sec" accept="image/*" capture="environment" multiple aria-describedby="foto-yardim">
+        <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+        <span class="foto-yukle-baslik" id="foto-baslik">Fotoğraf çek veya seç</span>
+        <span class="foto-yukle-alt" id="foto-yardim">Birden fazla fotoğraf ekleyebilirsin</span>
+      </label>
+      <ul class="foto-onizleme" id="foto-onizleme" aria-label="Seçilen fotoğraflar" hidden></ul>
+    </div>
+
+    <div class="form-alan">
+      <label for="ad">Adı</label>
+      <input id="ad" name="ad" type="text" placeholder="Örn. Pamuk" maxlength="60" autocomplete="off" autocapitalize="words" enterkeyhint="next" required>
+    </div>
+
+    <fieldset class="form-alan">
+      <legend class="form-etiket">Tür</legend>
+      <div class="secim-grubu" id="tur-secim"><span class="iskelet" style="height:52px;grid-column:1/-1"></span></div>
+      <div id="diger-turler" hidden style="margin-top:8px">
+        <div class="secim-grubu secim-grubu-hap" id="diger-tur-secim" role="radiogroup" aria-label="Diğer türler"></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-alan">
+      <legend class="form-etiket">Cinsiyet</legend>
+      <div class="secim-grubu">
+        <label><input type="radio" name="cinsiyet" value="disi" required><span>Dişi</span></label>
+        <label><input type="radio" name="cinsiyet" value="erkek"><span>Erkek</span></label>
+        <label><input type="radio" name="cinsiyet" value="bilinmiyor"><span>Bilinmiyor</span></label>
+      </div>
+    </fieldset>
+
+    <div class="form-alan">
+      <label for="yas">Yaklaşık yaş</label>
+      <select id="yas" name="yas">
+        <option value="bilinmiyor">Bilinmiyor</option>
+        <option value="yavru">Yavru (0–1 yaş)</option>
+        <option value="genc">Genç (1–3 yaş)</option>
+        <option value="yetiskin">Yetişkin (3+ yaş)</option>
+        <option value="yil">Yaklaşık … yaş (gir)</option>
+      </select>
+    </div>
+    <div class="form-alan" id="yas-yil-alani" hidden>
+      <label for="yas_yil">Kaç yaşında? (yaklaşık)</label>
+      <input id="yas_yil" name="yas_yil" type="number" inputmode="decimal" min="0.5" max="30" step="0.5" placeholder="Örn. 2">
+    </div>
+
+    <details class="acilir" id="detaylar">
+      <summary><span>Detay ekle <span class="istege-bagli">(isteğe bağlı)</span></span></summary>
+      <div class="acilir-icerik">
+        <div class="form-alan">
+          <label for="dogum_tarihi">Kesin doğum tarihi</label>
+          <input id="dogum_tarihi" name="dogum_tarihi" type="date" aria-describedby="dogum-yardim">
+          <p class="form-yardim" id="dogum-yardim">Biliniyorsa gir; yaklaşık yaş seçiminin yerine geçer.</p>
+        </div>
+        <div class="form-alan">
+          <label for="cins">Cins</label>
+          <input id="cins" name="cins" type="text" placeholder="Örn. Tekir" maxlength="60" autocomplete="off">
+        </div>
+        <div class="form-alan">
+          <label class="secim-kutusu"><input type="checkbox" name="kisirlastirildi"> Kısırlaştırıldı</label>
+        </div>
+        <div class="form-alan">
+          <label for="saglik_durumu">Sağlık durumu</label>
+          <textarea id="saglik_durumu" name="saglik_durumu" rows="3" maxlength="2000" placeholder="Genel sağlık durumu, tedaviler, özel bakım ihtiyacı"></textarea>
+        </div>
+        <div class="form-alan">
+          <label for="karakter_notu">Karakteri</label>
+          <textarea id="karakter_notu" name="karakter_notu" rows="3" maxlength="1000" placeholder="Ör. Çocuklarla iyi anlaşır. İlk cümle profilde özet olarak görünür."></textarea>
+        </div>
+      </div>
+    </details>
+
+    <div class="alt-eylem">
+      <button class="btn btn-ana btn-buyuk btn-blok" type="submit" id="kaydet">Kaydet</button>
+    </div>
+  </form>
+</main>
+
+<script type="module" src="/static/js/sayfalar/panel-hayvan-ekle.js"></script>
+</body>
+</html>
