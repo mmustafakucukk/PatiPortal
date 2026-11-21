@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="baslik">
+  <title id="baslik">Kurum görseli yok</title>
+  <rect width="200" height="200" fill="#CFE0DC"/>
+  <!-- Bina ikonu: çizgi stili (24'lük ızgarada 1.8 kalınlık) -->
+  <g transform="translate(52 52) scale(4)" fill="none" stroke="#1F5F5B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 21h18"/>
+    <path d="M5 21V8l7-4.5L19 8v13"/>
+    <path d="M10 21v-4h4v4"/>
+    <path d="M9 10.5h.01M15 10.5h.01M9 14h.01M15 14h.01"/>
+  </g>
+</svg>

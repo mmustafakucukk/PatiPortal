@@ -1,0 +1,1591 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bileşenler – PatiPortal Tasarım Sistemi</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@800&display=swap">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    /* Yalnızca bu tanıtım sayfasının yerleşimi. Bileşen stilleri style.css'te. */
+    .demo-icindekiler {
+      position: sticky;
+      top: var(--ust-menu-yukseklik);
+      z-index: 45;
+      background: var(--zemin);
+      border-bottom: 1px solid var(--cizgi);
+    }
+    .demo-icindekiler ul {
+      display: flex;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .demo-icindekiler a {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--dokunma);
+      padding: 0 10px;
+      color: var(--metin-ikincil);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .demo-icindekiler a:hover { color: var(--renk-ana); }
+    .demo-bolum {
+      padding-block: 40px;
+      border-top: 1px solid var(--cizgi);
+      scroll-margin-top: calc(var(--ust-menu-yukseklik) + 52px);
+    }
+    .demo-bolum:first-of-type { border-top: 0; }
+    .demo-bolum > h2 { margin-bottom: 4px; }
+    .demo-aciklama { margin: 0 0 20px; color: var(--metin-ikincil); max-width: 720px; }
+    .demo-baslik {
+      margin: 28px 0 12px;
+      font-family: var(--font-govde);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--metin-ikincil);
+    }
+    .demo-durumlar {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
+      gap: 16px 12px;
+      align-items: start;
+    }
+    .demo-durumlar-genis { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+    .demo-etiket {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--metin-ikincil);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .demo-renkler {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+      gap: 12px;
+    }
+    .renk-kutu {
+      overflow: hidden;
+      background: var(--kart);
+      border: 1px solid var(--cizgi);
+      border-radius: var(--r-kontrol);
+      font-size: 13px;
+    }
+    .renk-kutu > span:first-child { display: block; height: 56px; border-bottom: 1px solid var(--cizgi); }
+    .renk-kutu > span:last-child { display: block; padding: 8px 10px; line-height: 1.35; }
+    .renk-kutu code { color: var(--metin-ikincil); font-size: 12px; }
+    .demo-cerceve {
+      overflow: hidden;
+      background: var(--zemin);
+      border: 1px dashed var(--kenarlik);
+      border-radius: var(--r-kart);
+    }
+    .demo-telefon { max-width: 390px; }
+    .demo-cerceve .panel-alt-menu,
+    .demo-cerceve .ust-cubuk { position: static; }
+    .demo-cerceve .ust-menu-mobil { display: block !important; }
+    .demo-cerceve .ust-menu { position: static; }
+    .demo-toastlar .toast-kap { position: static; width: auto; align-items: flex-start; }
+    .demo-katman { position: relative; min-height: 440px; }
+    .demo-katman .modal-arka { position: absolute; display: flex; z-index: 1; }
+    .demo-katman .cekmece-arka { position: absolute; display: block; z-index: 1; }
+    .demo-ikonlar {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .demo-ikonlar li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 6px 10px;
+      background: var(--kart);
+      border: 1px solid var(--cizgi);
+      border-radius: var(--r-kontrol);
+      color: var(--metin);
+      font-size: 12px;
+    }
+    .demo-ikonlar .ikon { width: 24px; height: 24px; }
+    .demo-gorseller { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .demo-gorseller figure { margin: 0; }
+    .demo-gorseller figcaption { margin-top: 6px; font-size: 12px; color: var(--metin-ikincil); }
+    .demo-yer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: rgba(30, 37, 35, 0.6);
+      font-size: 13px;
+    }
+    .demo-ust-bosluk { margin-top: 12px; }
+    #bicim-tablosu code, #api-sonuclari code, #api-sonuclari td { overflow-wrap: anywhere; min-width: 0; }
+  </style>
+</head>
+<body>
+
+<!-- İkon seti: satır içi SVG, çizgi stili, 1.8 kalınlık (renk ve kalınlık .ikon sınıfından gelir) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-pati" viewBox="0 0 24 24"><circle cx="6.5" cy="10" r="1.9"/><circle cx="9.5" cy="5.8" r="1.9"/><circle cx="14.5" cy="5.8" r="1.9"/><circle cx="17.5" cy="10" r="1.9"/><path d="M12 12.2c-2.3 0-3.7 1.8-4.8 3.5-1 1.6-.8 3.6 1 4.1 1.3.4 2.4-.3 3.8-.3s2.5.7 3.8.3c1.8-.5 2-2.5 1-4.1-1.1-1.7-2.5-3.5-4.8-3.5z"/></symbol>
+  <symbol id="i-arti" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-geri" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-ileri" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-asagi" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-ara" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-kapat" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-onay" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-takvim" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+  <symbol id="i-saat" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-telefon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-konum" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-ev" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-belge" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-ihtiyac" viewBox="0 0 24 24"><path d="M6 8h12l-1 12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-daha" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+  <symbol id="i-kamera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+  <symbol id="i-uyari" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.5h.01"/></symbol>
+  <symbol id="i-bilgi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/></symbol>
+  <symbol id="i-cikis" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="m10 17 5-5-5-5M15 12H3"/></symbol>
+  <symbol id="i-filtre" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-bina" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-4.5L19 8v13M10 21v-4h4v4M9 10.5h.01M15 10.5h.01M9 14h.01M15 14h.01"/></symbol>
+  <symbol id="i-cop" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-duzenle" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="i-asi" viewBox="0 0 24 24"><path d="m18 2 4 4M17 7l3-3M19 9l-10.3 10.3a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 0 1 0-1.4L15 5M9 11l4 4M5 19l-3 3M14 4l6 6"/></symbol>
+  <symbol id="i-goz" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-kullanici" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-yenile" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+</svg>
+
+<!-- Üst menü ve acil bandı layout.js ile yerleştirilir -->
+<div id="ust-menu"></div>
+
+<nav class="demo-icindekiler" aria-label="Bileşenler içindekiler">
+  <div class="konteyner">
+    <ul>
+      <li><a href="#calisan">Çalışan örnekler</a></li>
+      <li><a href="#renkler">Renkler</a></li>
+      <li><a href="#tipografi">Tipografi</a></li>
+      <li><a href="#gorseller">Logo ve görseller</a></li>
+      <li><a href="#ikonlar">İkonlar</a></li>
+      <li><a href="#butonlar">Butonlar</a></li>
+      <li><a href="#rozetler">Rozetler</a></li>
+      <li><a href="#formlar">Formlar</a></li>
+      <li><a href="#secim-grubu">Seçim grubu</a></li>
+      <li><a href="#foto-yukle">Fotoğraf yükleme</a></li>
+      <li><a href="#kartlar">Kartlar</a></li>
+      <li><a href="#hayvan-kurum-ihtiyac">Hayvan / kurum / ihtiyaç</a></li>
+      <li><a href="#ilerleme">İlerleme</a></li>
+      <li><a href="#sekmeler">Sekmeler</a></li>
+      <li><a href="#tablo">Tablo</a></li>
+      <li><a href="#saat-secici">Saat seçici</a></li>
+      <li><a href="#zaman-cizelgesi">Zaman çizelgesi</a></li>
+      <li><a href="#durumlar">Durumlar</a></li>
+      <li><a href="#toast">Toast</a></li>
+      <li><a href="#modal">Modal ve çekmece</a></li>
+      <li><a href="#gezinme">Sayfalama</a></li>
+      <li><a href="#duzen">Düzen parçaları</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="konteyner">
+
+  <section class="demo-bolum">
+    <p class="ust-baslik">PatiPortal · Tasarım sistemi</p>
+    <h1>Bileşenler</h1>
+    <p class="demo-aciklama">Tüm ortak bileşenler, <code>/static/css/style.css</code> içindeki sınıflarla ve durumlarıyla (normal, hover, odak, pasif, hata). Hover ve odak örnekleri bu sayfada <code>.durum-hover</code> / <code>.durum-odak</code> yardımcı sınıflarıyla sabitlenmiştir; gerçek sayfalarda bu durumlar fare ve klavye ile oluşur. İlk bölümdeki örnekler ortak JS dosyalarıyla (<code>layout.js</code>, <code>ui.js</code>, <code>kurum.js</code>, <code>api.js</code>) çalışır; diğer bölümler statik HTML'dir.</p>
+  </section>
+
+  <!-- ===== 0. Çalışan örnekler (JS) ===== -->
+  <section class="demo-bolum" id="calisan" aria-labelledby="calisan-baslik">
+    <h2 id="calisan-baslik">Çalışan örnekler</h2>
+    <p class="demo-aciklama">Üstteki menü, acil bandı ve en alttaki alt bilgi <code>layout.js</code> ile çizilir. Oturum ve veriler gerçek backend'den (<code>/api/...</code>) gelir. Rol değişince üst menü, panel menüsü ve kurum seçici değişir.</p>
+
+    <h3 class="demo-baslik">Oturum</h3>
+    <div class="kart">
+      <div id="rol-bilgi" class="yigin" aria-live="polite"><span class="donen" aria-hidden="true"></span></div>
+    </div>
+
+    <h3 class="demo-baslik">Toast, modal, onay penceresi, çekmece</h3>
+    <div class="satir">
+      <button class="btn btn-cerceve" type="button" data-toast="basari">Başarı toast'ı</button>
+      <button class="btn btn-cerceve" type="button" data-toast="hata">Hata toast'ı</button>
+      <button class="btn btn-cerceve" type="button" data-toast="uyari">Uyarı toast'ı</button>
+      <button class="btn btn-cerceve" type="button" data-toast="bilgi">Bilgi toast'ı</button>
+    </div>
+    <div class="satir demo-ust-bosluk">
+      <button class="btn btn-ana" type="button" id="demo-modal">Modal aç</button>
+      <button class="btn btn-tehlike" type="button" id="demo-onay">Onay penceresi</button>
+      <button class="btn btn-cerceve" type="button" id="demo-cekmece"><svg class="ikon" aria-hidden="true"><use href="#i-filtre"/></svg>Çekmece aç</button>
+    </div>
+
+    <h3 class="demo-baslik">Kurum seçici ve panel menüsü</h3>
+    <div class="izgara izgara-genis" style="align-items:start">
+      <div class="demo-cerceve demo-telefon">
+        <div class="panel-ust">
+          <div class="panel-ust-ic">
+            <div>
+              <p class="panel-ust-etiket">Görevli paneli</p>
+              <h1 id="demo-selam">Merhaba</h1>
+              <div id="demo-kurum-secici"></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:16px">
+          <p class="metin-ikincil" style="margin:0" aria-live="polite" id="demo-aktif-kurum">—</p>
+        </div>
+        <div id="demo-panel-menu"></div>
+      </div>
+      <div class="demo-cerceve" style="padding:16px">
+        <p class="demo-etiket" style="margin-top:0">Yönetim menüsü (genişlikle değişir)</p>
+        <div id="yonetim-menu"></div>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">Form hataları</h3>
+    <form class="kart" id="demo-form" novalidate style="max-width:560px">
+      <div class="form-alan">
+        <label for="demo-eposta">E-posta</label>
+        <input id="demo-eposta" name="email" type="email" value="elif@ornek">
+      </div>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Ev tipi</legend>
+        <div class="secim-grubu">
+          <label><input type="radio" name="ev_tipi" value="apartman"><span>Apartman</span></label>
+          <label><input type="radio" name="ev_tipi" value="bahceli_ev"><span>Bahçeli ev</span></label>
+          <label><input type="radio" name="ev_tipi" value="diger"><span>Diğer</span></label>
+        </div>
+      </fieldset>
+      <div class="form-alan">
+        <label class="secim-kutusu"><input type="checkbox" name="kvkk_onay"> KVKK metnini okudum, onaylıyorum.</label>
+      </div>
+      <div class="satir">
+        <button class="btn btn-ana" type="submit">Sunucuya gönder</button>
+        <button class="btn btn-cerceve" type="button" id="demo-form-temizle">Hataları temizle</button>
+      </div>
+    </form>
+
+    <h3 class="demo-baslik">Yükleniyor, hata ve boş durum</h3>
+    <div class="satir">
+      <button class="btn btn-cerceve" type="button" data-durum="yukleniyor">Yükleniyor</button>
+      <button class="btn btn-cerceve" type="button" data-durum="hata">Hata</button>
+      <button class="btn btn-cerceve" type="button" data-durum="bos">Boş durum</button>
+      <button class="btn btn-cerceve" type="button" data-durum="veri">Veriyi getir (API)</button>
+    </div>
+    <div id="demo-durum-kabi" class="izgara demo-ust-bosluk"></div>
+
+    <h3 class="demo-baslik">Biçimlendirme yardımcıları (ui.js)</h3>
+    <div class="tablo-kap">
+      <table class="tablo">
+        <caption class="gizli-erisim">Biçimlendirme fonksiyonlarının çıktıları</caption>
+        <thead><tr><th scope="col">Çağrı</th><th scope="col">Sonuç</th></tr></thead>
+        <tbody id="bicim-tablosu"></tbody>
+      </table>
+    </div>
+
+    <h3 class="demo-baslik">Mock API kendini sınama</h3>
+    <p class="demo-aciklama">Tüm GET uç noktaları oturumdaki kullanıcıyla çağrılır. Yetkisi olmayan rolde 401/403 dönmesi beklenen davranıştır.</p>
+    <button class="btn btn-cerceve" type="button" id="api-sinama"><svg class="ikon" aria-hidden="true"><use href="#i-yenile"/></svg>Uç noktaları sına</button>
+    <div class="tablo-kap demo-ust-bosluk">
+      <table class="tablo">
+        <caption class="gizli-erisim">Mock API sınama sonuçları</caption>
+        <thead><tr><th scope="col">İstek</th><th scope="col">Sonuç</th></tr></thead>
+        <tbody id="api-sonuclari"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 1. Renkler ===== -->
+  <section class="demo-bolum" id="renkler">
+    <h2>Renkler</h2>
+    <p class="demo-aciklama">CSS değişkeni olarak <code>:root</code> içinde tanımlıdır.</p>
+
+    <h3 class="demo-baslik">Ana renk, zemin ve metin</h3>
+    <div class="demo-renkler">
+      <div class="renk-kutu"><span style="background:var(--renk-ana)"></span><span>Ana renk<br><code>--renk-ana #1F5F5B</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--renk-ana-hover)"></span><span>Ana renk hover<br><code>--renk-ana-hover #174744</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--renk-ana-acik)"></span><span>Ana renk açık<br><code>--renk-ana-acik #CFE0DC</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--renk-ana-soluk)"></span><span>Ana renk soluk<br><code>--renk-ana-soluk #EEF4F3</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--zemin)"></span><span>Sayfa zemini<br><code>--zemin #FBF8F4</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--kart)"></span><span>Kart<br><code>--kart #FFFFFF</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--metin)"></span><span>Metin<br><code>--metin #1E2523</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--metin-ikincil)"></span><span>İkincil metin<br><code>--metin-ikincil #4F5856</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--cizgi)"></span><span>Çizgi<br><code>--cizgi #E7E1D8</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--kenarlik)"></span><span>Form kenarlığı<br><code>--kenarlik #D9D1C5</code></span></div>
+    </div>
+
+    <h3 class="demo-baslik">Durum renkleri (metin / zemin)</h3>
+    <div class="demo-renkler">
+      <div class="renk-kutu"><span style="background:var(--acil-zemin);color:var(--acil);display:flex;align-items:center;justify-content:center;font-weight:600">Acil</span><span><code>--acil #B42318</code><br><code>--acil-zemin #FDE2DF</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--uyari-zemin);color:var(--uyari);display:flex;align-items:center;justify-content:center;font-weight:600">Uyarı</span><span><code>--uyari #8A4B0F</code><br><code>--uyari-zemin #FCE9D2</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--basari-zemin);color:var(--basari);display:flex;align-items:center;justify-content:center;font-weight:600">Başarı</span><span><code>--basari #17603F</code><br><code>--basari-zemin #DCEFE6</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--bilgi-zemin);color:var(--bilgi);display:flex;align-items:center;justify-content:center;font-weight:600">Bilgi</span><span><code>--bilgi #24507A</code><br><code>--bilgi-zemin #E6EEF6</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--notr-zemin);color:var(--notr);display:flex;align-items:center;justify-content:center;font-weight:600">Nötr</span><span><code>--notr #4F5856</code><br><code>--notr-zemin #F1ECE5</code></span></div>
+    </div>
+
+    <h3 class="demo-baslik">Fotoğraf yer tutucu tonları</h3>
+    <div class="demo-renkler">
+      <div class="renk-kutu"><span style="background:var(--yer-1)"></span><span><code>--yer-1</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-2)"></span><span><code>--yer-2</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-3)"></span><span><code>--yer-3</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-4)"></span><span><code>--yer-4</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-5)"></span><span><code>--yer-5</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-6)"></span><span><code>--yer-6</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-7)"></span><span><code>--yer-7</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-8)"></span><span><code>--yer-8</code></span></div>
+      <div class="renk-kutu"><span style="background:var(--yer-9)"></span><span><code>--yer-9</code></span></div>
+    </div>
+  </section>
+
+  <!-- ===== 2. Tipografi ===== -->
+  <section class="demo-bolum" id="tipografi">
+    <h2>Tipografi</h2>
+    <p class="demo-aciklama">Başlıklar Nunito 800, gövde metni Inter 400 / 500 / 600.</p>
+    <h1>Bir dost sahiplen, bir hayata ortak ol.</h1>
+    <h2>Yuva arayan dostlarımız</h2>
+    <h3>Aşı karnesi</h3>
+    <h4>Bu hafta yapılacak aşılar</h4>
+    <p>Inter 400 – Barınaktaki kedi ve köpekleri tanı, aşı durumlarını gör ve tek formla sahiplenme başvurusu yap.</p>
+    <p style="font-weight:500">Inter 500 – Acil mama ve ilaç ihtiyaçlarına da buradan destek olabilirsin.</p>
+    <p style="font-weight:600">Inter 600 – Başvurun görevliye iletilir, genellikle 3 iş günü içinde dönüş yapılır.</p>
+    <p class="metin-ikincil metin-kucuk">İkincil metin (14px) – Kedi · Dişi · 2 yaş · Kısırlaştırılmış</p>
+
+    <h3 class="demo-baslik">Türkçe karakter testi</h3>
+    <div class="kart">
+      <p style="font-family:var(--font-baslik);font-weight:800;font-size:28px;margin:0 0 8px">ı İ ş Ş ğ Ğ ü Ü ö Ö ç Ç – Işıl, Çağrı, Gökşin, Ödül, Üzüm</p>
+      <p style="margin:0">ı İ ş Ş ğ Ğ ü Ü ö Ö ç Ç – Pijamalı hasta yağız şoföre çabucak güvendi. İĞNE, ŞIRINGA, ÜÇGEN, ÇÖPÇÜ.</p>
+    </div>
+  </section>
+
+  <!-- ===== 3. Logo ve görseller ===== -->
+  <section class="demo-bolum" id="gorseller">
+    <h2>Logo ve görseller</h2>
+    <p class="demo-aciklama">Üst menüde logo satır içi SVG + metin olarak basılır (web fontu kullanabilsin diye). <code>static/img/</code> altındaki dosyalar fotoğrafı veya görseli olmayan kayıtlar ve sekme ikonu içindir.</p>
+    <div class="demo-gorseller">
+      <figure>
+        <a class="logo" href="/index.html"><svg class="ikon" aria-hidden="true"><use href="#i-pati"/></svg>PatiPortal</a>
+        <figcaption>.logo (HTML)</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/logo.svg" alt="PatiPortal logosu" width="196" height="40">
+        <figcaption>logo.svg</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/fotograf-yok.svg" alt="Fotoğraf yok yer tutucusu" width="240" height="160" style="border-radius:12px">
+        <figcaption>fotograf-yok.svg (3:2)</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/kurum-yok.svg" alt="Kurum görseli yok yer tutucusu" width="96" height="96" style="border-radius:14px">
+        <figcaption>kurum-yok.svg</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/favicon.svg" alt="Favicon" width="48" height="48">
+        <figcaption>favicon.svg</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/favicon-32.png" alt="32 piksellik favicon" width="32" height="32">
+        <figcaption>favicon-32.png</figcaption>
+      </figure>
+      <figure>
+        <img src="/static/img/apple-touch-icon.png" alt="Apple dokunmatik ikonu" width="60" height="60" style="border-radius:14px">
+        <figcaption>apple-touch-icon.png</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===== 4. İkonlar ===== -->
+  <section class="demo-bolum" id="ikonlar">
+    <h2>İkonlar</h2>
+    <p class="demo-aciklama">Satır içi SVG, çizgi stili, 1.8 kalınlık, <code>currentColor</code>. Boyut: <code>.ikon</code> 20px, <code>.ikon-kucuk</code> 16px, <code>.ikon-buyuk</code> 24px.</p>
+    <ul class="demo-ikonlar">
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-pati"/></svg>pati</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-arti"/></svg>arti</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-geri"/></svg>geri</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-ileri"/></svg>ileri</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-asagi"/></svg>asagi</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-ara"/></svg>ara</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg>kapat</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg>onay</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-takvim"/></svg>takvim</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-saat"/></svg>saat</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-telefon"/></svg>telefon</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-konum"/></svg>konum</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-ev"/></svg>ev</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-belge"/></svg>belge</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-ihtiyac"/></svg>ihtiyac</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-menu"/></svg>menu</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-daha"/></svg>daha</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-kamera"/></svg>kamera</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>uyari</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-bilgi"/></svg>bilgi</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-cikis"/></svg>cikis</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-filtre"/></svg>filtre</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>bina</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-cop"/></svg>cop</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-duzenle"/></svg>duzenle</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-asi"/></svg>asi</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-goz"/></svg>goz</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-kullanici"/></svg>kullanici</li>
+      <li><svg class="ikon" aria-hidden="true"><use href="#i-yenile"/></svg>yenile</li>
+    </ul>
+  </section>
+
+  <!-- ===== 5. Butonlar ===== -->
+  <section class="demo-bolum" id="butonlar">
+    <h2>Butonlar</h2>
+    <p class="demo-aciklama"><code>.btn</code> + tür sınıfı. En az 44×44px dokunma alanı. İşlem sürerken <code>aria-busy="true"</code> ve <code>disabled</code> birlikte verilir.</p>
+
+    <h3 class="demo-baslik">.btn-ana</h3>
+    <div class="demo-durumlar">
+      <div><span class="demo-etiket">Normal</span><button class="btn btn-ana" type="button">Hayvanları gör</button></div>
+      <div><span class="demo-etiket">Hover</span><button class="btn btn-ana durum-hover" type="button">Hayvanları gör</button></div>
+      <div><span class="demo-etiket">Odak</span><button class="btn btn-ana durum-odak" type="button">Hayvanları gör</button></div>
+      <div><span class="demo-etiket">Pasif</span><button class="btn btn-ana" type="button" disabled>Hayvanları gör</button></div>
+      <div><span class="demo-etiket">İşlem sürüyor</span><button class="btn btn-ana" type="button" aria-busy="true" disabled>Kaydediliyor</button></div>
+    </div>
+
+    <h3 class="demo-baslik">.btn-cerceve</h3>
+    <div class="demo-durumlar">
+      <div><span class="demo-etiket">Normal</span><button class="btn btn-cerceve" type="button">İhtiyaçlara destek ol</button></div>
+      <div><span class="demo-etiket">Hover</span><button class="btn btn-cerceve durum-hover" type="button">İhtiyaçlara destek ol</button></div>
+      <div><span class="demo-etiket">Odak</span><button class="btn btn-cerceve durum-odak" type="button">İhtiyaçlara destek ol</button></div>
+      <div><span class="demo-etiket">Pasif</span><button class="btn btn-cerceve" type="button" disabled>İhtiyaçlara destek ol</button></div>
+      <div><span class="demo-etiket">İşlem sürüyor</span><button class="btn btn-cerceve" type="button" aria-busy="true" disabled>Yükleniyor</button></div>
+    </div>
+
+    <h3 class="demo-baslik">.btn-cerceve-ana</h3>
+    <div class="demo-durumlar">
+      <div><span class="demo-etiket">Normal</span><button class="btn btn-cerceve-ana" type="button">İşaretle</button></div>
+      <div><span class="demo-etiket">Hover</span><button class="btn btn-cerceve-ana durum-hover" type="button">İşaretle</button></div>
+      <div><span class="demo-etiket">Odak</span><button class="btn btn-cerceve-ana durum-odak" type="button">İşaretle</button></div>
+      <div><span class="demo-etiket">Pasif</span><button class="btn btn-cerceve-ana" type="button" disabled>İşaretle</button></div>
+    </div>
+
+    <h3 class="demo-baslik">.btn-tehlike ve .btn-tehlike-dolu</h3>
+    <div class="demo-durumlar">
+      <div><span class="demo-etiket">Normal</span><button class="btn btn-tehlike" type="button">Reddet</button></div>
+      <div><span class="demo-etiket">Hover</span><button class="btn btn-tehlike durum-hover" type="button">Reddet</button></div>
+      <div><span class="demo-etiket">Odak</span><button class="btn btn-tehlike durum-odak" type="button">Reddet</button></div>
+      <div><span class="demo-etiket">Pasif</span><button class="btn btn-tehlike" type="button" disabled>Reddet</button></div>
+      <div><span class="demo-etiket">Dolu (kesin silme)</span><button class="btn btn-tehlike-dolu" type="button">Hesabımı sil</button></div>
+      <div><span class="demo-etiket">Dolu hover</span><button class="btn btn-tehlike-dolu durum-hover" type="button">Hesabımı sil</button></div>
+    </div>
+
+    <h3 class="demo-baslik">.btn-ikon</h3>
+    <div class="demo-durumlar">
+      <div><span class="demo-etiket">Normal</span><button class="btn btn-ikon" type="button" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button></div>
+      <div><span class="demo-etiket">Hover</span><button class="btn btn-ikon durum-hover" type="button" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button></div>
+      <div><span class="demo-etiket">Odak</span><button class="btn btn-ikon durum-odak" type="button" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button></div>
+      <div><span class="demo-etiket">Pasif</span><button class="btn btn-ikon" type="button" aria-label="Kapat" disabled><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button></div>
+      <div><span class="demo-etiket">Sade (.btn-sade)</span><button class="btn btn-ikon btn-sade" type="button" aria-label="Geri"><svg class="ikon ikon-buyuk" aria-hidden="true"><use href="#i-geri"/></svg></button></div>
+    </div>
+
+    <h3 class="demo-baslik">İkonlu, blok, büyük ve grup</h3>
+    <div class="yigin" style="max-width:420px">
+      <a class="btn btn-ana" href="#butonlar"><svg class="ikon" aria-hidden="true"><use href="#i-arti"/></svg>Yeni ihtiyaç</a>
+      <button class="btn btn-ana btn-buyuk btn-blok" type="button"><svg class="ikon" aria-hidden="true"><use href="#i-arti"/></svg>Hayvan Ekle</button>
+      <button class="btn btn-ana btn-blok" type="button">Pamuk'u sahiplenmek istiyorum</button>
+      <div class="btn-grup">
+        <button class="btn btn-cerceve" type="button">Detay</button>
+        <button class="btn btn-tehlike" type="button">Reddet</button>
+        <button class="btn btn-ana" type="button">Onayla</button>
+      </div>
+      <div class="btn-grup">
+        <a class="btn btn-cerceve btn-buyuk" href="#butonlar">Aşı gir</a>
+        <a class="btn btn-cerceve btn-buyuk" href="#butonlar">İhtiyaç ekle</a>
+      </div>
+      <p class="satir" style="margin:0"><a class="baglanti" href="#butonlar">Tümünü gör (34)</a> <button class="baglanti baglanti-sade" type="button">Temizle</button></p>
+    </div>
+  </section>
+
+  <!-- ===== 6. Rozetler ===== -->
+  <section class="demo-bolum" id="rozetler">
+    <h2>Rozetler</h2>
+    <p class="demo-aciklama"><code>.rozet</code> + <code>-basari</code>, <code>-uyari</code>, <code>-acil</code>, <code>-bilgi</code>, <code>-notr</code>. Köşe 999px.</p>
+    <div class="satir">
+      <span class="rozet rozet-basari">Aşıları tam</span>
+      <span class="rozet rozet-uyari">Aşı bekliyor</span>
+      <span class="rozet rozet-acil">Yüksek</span>
+      <span class="rozet rozet-bilgi">Kısırlaştırılmış</span>
+      <span class="rozet rozet-notr">Barınakta</span>
+      <span class="rozet rozet-basari"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg>Güncel</span>
+      <span class="rozet rozet-uyari">Yaklaşıyor</span>
+      <span class="rozet rozet-acil">Gecikmiş</span>
+      <span class="rozet rozet-notr">Henüz yapılmadı</span>
+      <span class="rozet rozet-uyari">Orta</span>
+      <span class="rozet rozet-notr">Düşük</span>
+    </div>
+    <h3 class="demo-baslik">.rozet-buyuk (hayvan detay üst rozetleri)</h3>
+    <div class="satir">
+      <span class="rozet rozet-buyuk rozet-basari">Aşıları tam</span>
+      <span class="rozet rozet-buyuk rozet-bilgi">Kısırlaştırılmış</span>
+      <span class="rozet rozet-buyuk rozet-notr">Barınakta</span>
+      <span class="rozet rozet-buyuk rozet-uyari">Rezerve</span>
+      <span class="rozet rozet-buyuk rozet-basari">Yuvasını buldu</span>
+    </div>
+  </section>
+
+  <!-- ===== 7. Formlar ===== -->
+  <section class="demo-bolum" id="formlar">
+    <h2>Form alanları</h2>
+    <p class="demo-aciklama"><code>.form-alan</code>: label + girdi + <code>.form-yardim</code> + <code>.form-hata</code>. Hata durumu <code>aria-invalid="true"</code> (veya <code>.form-alan.hatali</code>) ile verilir, hata mesajı <code>aria-describedby</code> ile bağlanır. Boş <code>.form-hata</code> görünmez.</p>
+
+    <h3 class="demo-baslik">Metin girişi – durumlar</h3>
+    <div class="demo-durumlar demo-durumlar-genis">
+      <div class="form-alan">
+        <label for="f-normal">Adı <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="f-normal" type="text" placeholder="Örn. Pamuk" aria-describedby="f-normal-yardim">
+        <p class="form-yardim" id="f-normal-yardim">Normal</p>
+      </div>
+      <div class="form-alan">
+        <label for="f-hover">Adı</label>
+        <input id="f-hover" class="durum-hover" type="text" placeholder="Örn. Pamuk">
+        <p class="form-yardim">Hover</p>
+      </div>
+      <div class="form-alan">
+        <label for="f-odak">Adı</label>
+        <input id="f-odak" class="durum-odak" type="text" value="Pamuk">
+        <p class="form-yardim">Odak</p>
+      </div>
+      <div class="form-alan">
+        <label for="f-pasif">Telefon</label>
+        <input id="f-pasif" type="tel" value="0532 123 45 67" disabled>
+        <p class="form-yardim">Pasif – profilden gelir, değiştirilemez</p>
+      </div>
+      <div class="form-alan hatali">
+        <label for="f-hata">E-posta <span class="zorunlu" aria-hidden="true">*</span></label>
+        <input id="f-hata" type="email" value="ayse@ornek" aria-invalid="true" aria-describedby="f-hata-mesaj">
+        <p class="form-hata" id="f-hata-mesaj">Geçerli bir e-posta adresi girin.</p>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">Seçim listesi, tarih, çok satırlı alan</h3>
+    <div class="form-satir">
+      <div class="form-alan">
+        <label for="f-yas">Yaklaşık yaş</label>
+        <select id="f-yas">
+          <option>Bilinmiyor</option>
+          <option>Yavru (0–1)</option>
+          <option>Genç (1–3)</option>
+          <option>Yetişkin (3+)</option>
+        </select>
+      </div>
+      <div class="form-alan">
+        <label for="f-sirala">Sıralama (pasif)</label>
+        <select id="f-sirala" disabled><option>En yeni eklenen</option></select>
+      </div>
+      <div class="form-alan">
+        <label for="f-tarih">Yapılma tarihi</label>
+        <input id="f-tarih" type="date" value="2026-11-20">
+        <p class="form-yardim">Gelecek bir tarih seçilemez.</p>
+      </div>
+      <div class="form-alan hatali">
+        <label for="f-tarih2">Sonraki doz tarihi</label>
+        <input id="f-tarih2" type="date" value="2026-11-01" aria-invalid="true" aria-describedby="f-tarih2-hata">
+        <p class="form-hata" id="f-tarih2-hata">Sonraki doz, yapılma tarihinden sonra olmalı.</p>
+      </div>
+    </div>
+    <div class="form-satir">
+      <div class="form-alan">
+        <label for="f-neden">Neden sahiplenmek istiyorsunuz? <span class="zorunlu" aria-hidden="true">*</span></label>
+        <textarea id="f-neden" placeholder="Evinizi ve günlük düzeninizi kısaca anlatın" aria-describedby="f-neden-yardim"></textarea>
+        <p class="form-yardim" id="f-neden-yardim">En az 30 karakter.</p>
+      </div>
+      <div class="form-alan">
+        <label for="f-neden2">Neden sahiplenmek istiyorsunuz? <span class="zorunlu" aria-hidden="true">*</span></label>
+        <textarea id="f-neden2" aria-invalid="true" aria-describedby="f-neden2-hata">Kedileri severim.</textarea>
+        <p class="form-hata" id="f-neden2-hata">En az 30 karakter yazın (şu an 17).</p>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">Girdi grubu (şifreyi göster, arama)</h3>
+    <div class="form-satir">
+      <div class="form-alan">
+        <label for="f-sifre">Şifre</label>
+        <div class="girdi-grubu">
+          <input id="f-sifre" type="password" value="gizlisifre" aria-describedby="f-sifre-yardim">
+          <button class="btn btn-ikon" type="button" aria-label="Şifreyi göster" aria-pressed="false"><svg class="ikon" aria-hidden="true"><use href="#i-goz"/></svg></button>
+        </div>
+        <p class="form-yardim" id="f-sifre-yardim">En az 8 karakter.</p>
+      </div>
+      <div class="form-alan">
+        <label for="f-ara" class="gizli-erisim">İsimle ara</label>
+        <span class="form-etiket" aria-hidden="true">Arama</span>
+        <div class="girdi-grubu girdi-grubu-sol">
+          <svg class="ikon" aria-hidden="true"><use href="#i-ara"/></svg>
+          <input id="f-ara" type="search" placeholder="İsimle ara…">
+        </div>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">Onay kutusu ve radyo düğmesi</h3>
+    <div class="demo-durumlar demo-durumlar-genis">
+      <fieldset>
+        <legend class="form-etiket">Cinsiyet</legend>
+        <label class="secim-kutusu"><input type="checkbox" checked> Dişi</label>
+        <label class="secim-kutusu"><input type="checkbox" checked> Erkek</label>
+        <label class="secim-kutusu"><input type="checkbox" disabled> Bilinmiyor (pasif)</label>
+      </fieldset>
+      <fieldset>
+        <legend class="form-etiket">Yaş</legend>
+        <label class="secim-kutusu"><input type="radio" name="demo-yas"> Yavru (0–1)</label>
+        <label class="secim-kutusu"><input type="radio" name="demo-yas"> Genç (1–3)</label>
+        <label class="secim-kutusu"><input type="radio" name="demo-yas" disabled> Yetişkin (3+) (pasif)</label>
+        <label class="secim-kutusu"><input type="radio" name="demo-yas" checked> Hepsi</label>
+      </fieldset>
+      <div class="form-alan">
+        <label class="secim-kutusu secim-kutusu-ust"><input type="checkbox" aria-describedby="f-kvkk-yardim"> <span><a href="/kvkk.html">KVKK Aydınlatma Metni</a>'ni okudum, kişisel verilerimin işlenmesini kabul ediyorum.</span></label>
+        <p class="form-yardim" id="f-kvkk-yardim">Normal</p>
+        <label class="secim-kutusu secim-kutusu-ust hatali"><input type="checkbox" aria-invalid="true" aria-describedby="f-kvkk-hata"> <span>KVKK Aydınlatma Metni'ni okudum, kabul ediyorum.</span></label>
+        <p class="form-hata" id="f-kvkk-hata">Devam etmek için onay vermelisiniz.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 8. Seçim grubu ===== -->
+  <section class="demo-bolum" id="secim-grubu">
+    <h2>Seçim grubu</h2>
+    <p class="demo-aciklama"><code>.secim-grubu</code>: radyo düğmeleri yan yana butonlar gibi görünür; klavye ile ok tuşlarıyla gezilir. Hap görünümü için <code>.secim-grubu-hap</code>.</p>
+
+    <div class="demo-durumlar demo-durumlar-genis">
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Tür – normal / seçili</legend>
+        <div class="secim-grubu">
+          <label><input type="radio" name="sg-tur" checked><span>Kedi</span></label>
+          <label><input type="radio" name="sg-tur"><span>Köpek</span></label>
+          <label><input type="radio" name="sg-tur"><span>Diğer</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Hover ve odak</legend>
+        <div class="secim-grubu">
+          <label><input type="radio" name="sg-cins" checked><span>Dişi</span></label>
+          <label><input type="radio" name="sg-cins"><span class="durum-hover">Erkek</span></label>
+          <label><input type="radio" name="sg-cins"><span class="durum-odak">Bilinmiyor</span></label>
+        </div>
+        <p class="form-yardim">Erkek: hover · Bilinmiyor: odak</p>
+      </fieldset>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Pasif seçenek</legend>
+        <div class="secim-grubu">
+          <label><input type="radio" name="sg-durum" checked><span>Yuva arıyor</span></label>
+          <label><input type="radio" name="sg-durum"><span>Tedavide</span></label>
+          <label><input type="radio" name="sg-durum" disabled><span>Rezerve</span></label>
+        </div>
+        <p class="form-yardim">Rezerve, süreçle oluşur; elle seçilemez.</p>
+      </fieldset>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Cinsiyet <span class="zorunlu" aria-hidden="true">*</span></legend>
+        <div class="secim-grubu hatali">
+          <label><input type="radio" name="sg-hata" aria-describedby="sg-hata-mesaj"><span>Dişi</span></label>
+          <label><input type="radio" name="sg-hata" aria-describedby="sg-hata-mesaj"><span>Erkek</span></label>
+          <label><input type="radio" name="sg-hata" aria-describedby="sg-hata-mesaj"><span>Bilinmiyor</span></label>
+        </div>
+        <p class="form-hata" id="sg-hata-mesaj">Cinsiyet seçin.</p>
+      </fieldset>
+    </div>
+
+    <h3 class="demo-baslik">.secim-grubu-hap (filtreler)</h3>
+    <fieldset>
+      <legend class="form-etiket">Tür</legend>
+      <div class="secim-grubu secim-grubu-hap">
+        <label><input type="radio" name="sg-hap" checked><span>Hepsi</span></label>
+        <label><input type="radio" name="sg-hap"><span>Kedi</span></label>
+        <label><input type="radio" name="sg-hap"><span class="durum-hover">Köpek</span></label>
+        <label><input type="radio" name="sg-hap"><span>Kuş</span></label>
+        <label><input type="radio" name="sg-hap" disabled><span>Tavşan</span></label>
+      </div>
+    </fieldset>
+  </section>
+
+  <!-- ===== 9. Fotoğraf yükleme, açılır bölüm ===== -->
+  <section class="demo-bolum" id="foto-yukle">
+    <h2>Fotoğraf yükleme ve açılır bölüm</h2>
+    <p class="demo-aciklama"><code>.foto-yukle</code> içinde gizli dosya girdisi bulunur; tüm alan tıklanabilir. Seçilenler <code>.foto-onizleme</code> listesinde gösterilir. <code>&lt;details class="acilir"&gt;</code> isteğe bağlı alanları saklar.</p>
+
+    <div class="demo-durumlar demo-durumlar-genis">
+      <div>
+        <span class="demo-etiket">Normal</span>
+        <label class="foto-yukle">
+          <input type="file" accept="image/*" capture="environment" multiple>
+          <svg class="ikon" aria-hidden="true"><use href="#i-kamera"/></svg>
+          <span class="foto-yukle-baslik">Fotoğraf çek veya seç</span>
+          <span class="foto-yukle-alt">Birden fazla fotoğraf ekleyebilirsin</span>
+        </label>
+      </div>
+      <div>
+        <span class="demo-etiket">Hover</span>
+        <label class="foto-yukle durum-hover">
+          <input type="file" accept="image/*" multiple>
+          <svg class="ikon" aria-hidden="true"><use href="#i-kamera"/></svg>
+          <span class="foto-yukle-baslik">Fotoğraf çek veya seç</span>
+          <span class="foto-yukle-alt">Birden fazla fotoğraf ekleyebilirsin</span>
+        </label>
+      </div>
+      <div>
+        <span class="demo-etiket">Hata</span>
+        <label class="foto-yukle hatali">
+          <input type="file" accept="image/*" multiple aria-invalid="true" aria-describedby="foto-hata">
+          <svg class="ikon" aria-hidden="true"><use href="#i-kamera"/></svg>
+          <span class="foto-yukle-baslik">Fotoğraf çek veya seç</span>
+          <span class="foto-yukle-alt">Birden fazla fotoğraf ekleyebilirsin</span>
+        </label>
+        <p class="form-hata demo-ust-bosluk" id="foto-hata">Fotoğraflar yüklenemedi. Hayvan kaydedildi, tekrar deneyebilirsin.</p>
+      </div>
+      <div>
+        <span class="demo-etiket">Pasif (yükleniyor)</span>
+        <label class="foto-yukle">
+          <input type="file" accept="image/*" multiple disabled>
+          <span class="donen" aria-hidden="true"></span>
+          <span class="foto-yukle-baslik">Fotoğraflar yükleniyor…</span>
+          <span class="foto-yukle-alt">2 / 3</span>
+        </label>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">Önizleme</h3>
+    <ul class="foto-onizleme" style="max-width:420px">
+      <li>
+        <img src="/static/img/fotograf-yok.svg" alt="Seçilen fotoğraf 1">
+        <span class="rozet rozet-notr">Kapak</span>
+        <button class="btn btn-ikon" type="button" aria-label="Fotoğraf 1'i kaldır"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </li>
+      <li style="background:var(--yer-2)">
+        <button class="btn btn-ikon" type="button" aria-label="Fotoğraf 2'yi kaldır"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </li>
+      <li style="background:var(--yer-3)">
+        <button class="btn btn-ikon" type="button" aria-label="Fotoğraf 3'ü kaldır"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </li>
+    </ul>
+
+    <h3 class="demo-baslik">Açılır bölüm ve alt eylem çubuğu (hızlı ekleme)</h3>
+    <div class="demo-cerceve demo-telefon">
+      <div style="padding:16px 16px 0">
+        <details class="acilir">
+          <summary><span>Detay ekle <span class="istege-bagli">(isteğe bağlı)</span></span></summary>
+          <div class="acilir-icerik">
+            <div class="form-alan">
+              <label for="f-cins">Cins</label>
+              <input id="f-cins" type="text" placeholder="Örn. Tekir">
+            </div>
+            <label class="secim-kutusu"><input type="checkbox"> Kısırlaştırıldı</label>
+          </div>
+        </details>
+        <details class="acilir demo-ust-bosluk" open>
+          <summary><span>Açık hali</span></summary>
+          <div class="acilir-icerik">
+            <div class="form-alan">
+              <label for="f-saglik">Sağlık durumu</label>
+              <textarea id="f-saglik" placeholder="Genel sağlık durumu, tedaviler"></textarea>
+            </div>
+          </div>
+        </details>
+        <div class="alt-eylem">
+          <button class="btn btn-ana btn-buyuk btn-blok" type="button">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 10. Kart, sayaç, liste, bilgi tablosu ===== -->
+  <section class="demo-bolum" id="kartlar">
+    <h2>Kart, sayaç, liste satırı, bilgi tablosu</h2>
+
+    <h3 class="demo-baslik">.kart</h3>
+    <div class="izgara izgara-genis">
+      <div class="kart">
+        <div class="kart-baslik"><h3>Bu hafta yapılacak aşılar</h3><a class="baglanti" href="#kartlar">Tümü</a></div>
+        <ul class="liste">
+          <li class="liste-satiri">
+            <span class="kucuk-foto" style="background:var(--yer-3)" aria-hidden="true"></span>
+            <span class="liste-satiri-metin"><span class="liste-satiri-baslik">Tarçın</span><span class="liste-satiri-alt">Karma aşı rapel · Bugün</span></span>
+            <button class="btn btn-cerceve-ana" type="button">İşaretle</button>
+          </li>
+          <li class="liste-satiri">
+            <span class="kucuk-foto" style="background:var(--yer-6)" aria-hidden="true"></span>
+            <span class="liste-satiri-metin"><span class="liste-satiri-baslik">Zeytin</span><span class="liste-satiri-alt">Kuduz · Yarın</span></span>
+            <button class="btn btn-cerceve-ana durum-hover" type="button">İşaretle</button>
+          </li>
+          <li class="liste-satiri">
+            <img class="kucuk-foto" src="/static/img/fotograf-yok.svg" alt="">
+            <span class="liste-satiri-metin"><span class="liste-satiri-baslik">Fındık</span><span class="liste-satiri-alt">İç-dış parazit · Perşembe</span></span>
+            <button class="btn btn-cerceve-ana" type="button" disabled>İşaretle</button>
+          </li>
+        </ul>
+      </div>
+      <a class="kart" href="#kartlar">
+        <h3 style="margin-bottom:6px">Tıklanabilir kart</h3>
+        <p class="metin-ikincil" style="margin:0">Bağlantı olan kartlar hover'da gölge alır. <code>a.kart</code> veya <code>.kart-tiklanir</code>.</p>
+      </a>
+      <div class="kart kart-tiklanir durum-hover">
+        <h3 style="margin-bottom:6px">Kart – hover</h3>
+        <p class="metin-ikincil" style="margin:0">Kenarlık koyulaşır, hafif gölge.</p>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">.sayac (panel özet kutuları)</h3>
+    <div class="sayac-izgara sayac-izgara-4">
+      <a class="sayac" href="#kartlar"><span class="sayac-deger">34</span><span class="sayac-etiket">Barınaktaki hayvan</span></a>
+      <a class="sayac sayac-uyari" href="#kartlar"><span class="sayac-deger">5</span><span class="sayac-etiket">Bekleyen başvuru</span></a>
+      <a class="sayac sayac-acil" href="#kartlar"><span class="sayac-deger">3</span><span class="sayac-etiket">Açık ihtiyaç</span></a>
+      <a class="sayac sayac-bilgi" href="#kartlar"><span class="sayac-deger">4</span><span class="sayac-etiket">Bu hafta aşı</span></a>
+    </div>
+
+    <h3 class="demo-baslik">.bilgi-tablosu</h3>
+    <dl class="bilgi-tablosu" style="max-width:552px">
+      <div><dt>Tür / Cins</dt><dd>Kedi · Tekir</dd></div>
+      <div><dt>Cinsiyet</dt><dd>Dişi</dd></div>
+      <div><dt>Yaş</dt><dd>Yaklaşık 2 yaş</dd></div>
+      <div><dt>Kısırlaştırma</dt><dd>Kısırlaştırıldı</dd></div>
+    </dl>
+  </section>
+
+  <!-- ===== 11. Hayvan, kurum, ihtiyaç kartları ===== -->
+  <section class="demo-bolum" id="hayvan-kurum-ihtiyac">
+    <h2>Hayvan, kurum ve ihtiyaç kartları</h2>
+
+    <h3 class="demo-baslik">.hayvan-karti – normal, hover, fotoğrafsız, tedavide, yükleniyor</h3>
+    <div class="izgara">
+      <a class="hayvan-karti" href="#hayvan-kurum-ihtiyac">
+        <div class="hayvan-karti-foto" style="background:var(--yer-1)"><span class="demo-yer">Fotoğraf: Pamuk</span></div>
+        <div class="hayvan-karti-govde">
+          <div class="hayvan-karti-ust"><h3 class="hayvan-karti-ad">Pamuk</h3><span class="rozet rozet-basari">Aşıları tam</span></div>
+          <span class="hayvan-karti-bilgi">Kedi · Dişi · 2 yaş · Kısırlaştırılmış</span>
+          <span class="hayvan-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Merkez Barınak</span>
+        </div>
+      </a>
+      <a class="hayvan-karti durum-hover" href="#hayvan-kurum-ihtiyac">
+        <div class="hayvan-karti-foto" style="background:var(--yer-2)"><span class="demo-yer">Fotoğraf: Karabaş</span></div>
+        <div class="hayvan-karti-govde">
+          <div class="hayvan-karti-ust"><h3 class="hayvan-karti-ad">Karabaş</h3><span class="rozet rozet-basari">Aşıları tam</span></div>
+          <span class="hayvan-karti-bilgi">Köpek · Erkek · 4 yaş</span>
+          <span class="hayvan-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Selçuklu Hayvan Barınağı</span>
+        </div>
+      </a>
+      <a class="hayvan-karti" href="#hayvan-kurum-ihtiyac">
+        <div class="hayvan-karti-foto"><img src="/static/img/fotograf-yok.svg" alt=""></div>
+        <div class="hayvan-karti-govde">
+          <div class="hayvan-karti-ust"><h3 class="hayvan-karti-ad">Tarçın</h3><span class="rozet rozet-uyari">Aşı bekliyor</span></div>
+          <span class="hayvan-karti-bilgi">Kedi · Erkek · 6 aylık</span>
+          <span class="hayvan-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Meram Barınağı</span>
+        </div>
+      </a>
+      <a class="hayvan-karti hayvan-karti-soluk" href="#hayvan-kurum-ihtiyac">
+        <div class="hayvan-karti-foto"><img src="/static/img/fotograf-yok.svg" alt=""><span class="rozet rozet-bilgi">Tedavide</span></div>
+        <div class="hayvan-karti-govde">
+          <div class="hayvan-karti-ust"><h3 class="hayvan-karti-ad">Boncuk</h3><span class="rozet rozet-basari">Aşıları tam</span></div>
+          <span class="hayvan-karti-bilgi">Köpek · Dişi · Yaklaşık 1 yaş</span>
+          <span class="hayvan-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Merkez Barınak</span>
+        </div>
+      </a>
+      <div class="iskelet-kart" aria-hidden="true">
+        <div class="iskelet iskelet-foto"></div>
+        <div class="iskelet-kart-govde">
+          <div class="iskelet iskelet-baslik"></div>
+          <div class="iskelet iskelet-metin"></div>
+          <div class="iskelet iskelet-metin iskelet-metin-kisa"></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">.kurum-karti – normal, hover</h3>
+    <div class="izgara izgara-genis">
+      <a class="kurum-karti" href="#hayvan-kurum-ihtiyac">
+        <div class="kurum-karti-ust">
+          <img class="kurum-karti-logo" src="/static/img/kurum-yok.svg" alt="">
+          <div><h3 class="kurum-karti-ad">Merkez Barınak</h3><span class="rozet rozet-basari">Barınak</span></div>
+        </div>
+        <ul class="kurum-karti-bilgi">
+          <li><svg class="ikon" aria-hidden="true"><use href="#i-konum"/></svg>Selçuklu / Konya</li>
+          <li><svg class="ikon" aria-hidden="true"><use href="#i-telefon"/></svg>0332 123 45 67</li>
+        </ul>
+        <div class="kurum-karti-alt"><span><strong>12</strong> yuva arayan</span><span><strong>2</strong> açık ihtiyaç</span></div>
+      </a>
+      <a class="kurum-karti durum-hover" href="#hayvan-kurum-ihtiyac">
+        <div class="kurum-karti-ust">
+          <img class="kurum-karti-logo" src="/static/img/kurum-yok.svg" alt="">
+          <div><h3 class="kurum-karti-ad">Şifa Veteriner Kliniği</h3><span class="rozet rozet-bilgi">Klinik</span></div>
+        </div>
+        <ul class="kurum-karti-bilgi">
+          <li><svg class="ikon" aria-hidden="true"><use href="#i-konum"/></svg>Meram / Konya</li>
+          <li><svg class="ikon" aria-hidden="true"><use href="#i-telefon"/></svg>0332 765 43 21</li>
+        </ul>
+        <div class="kurum-karti-alt"><span><strong>3</strong> yuva arayan</span><span><strong>0</strong> açık ihtiyaç</span></div>
+      </a>
+    </div>
+
+    <h3 class="demo-baslik">.ihtiyac-karti – sayfa zemininde</h3>
+    <div class="izgara izgara-genis">
+      <article class="ihtiyac-karti">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">Mama</span><span class="rozet rozet-acil">Yüksek</span></div>
+        <h3 class="ihtiyac-karti-baslik">Yavru kedi maması</h3>
+        <span class="ihtiyac-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Merkez Barınak</span>
+        <div class="ilerleme" role="progressbar" aria-label="Yavru kedi maması karşılanma oranı" aria-valuemin="0" aria-valuemax="50" aria-valuenow="20" aria-valuetext="50 kg'ın 20 kg'ı için söz verildi, 8 kg teslim alındı">
+          <span class="ilerleme-soz" style="width:40%"></span>
+          <span class="ilerleme-teslim" style="width:16%"></span>
+        </div>
+        <p class="ilerleme-metin">20 / 50 kg için söz verildi · 8 kg teslim alındı</p>
+        <button class="btn btn-ana" type="button">Destek olacağım</button>
+      </article>
+      <article class="ihtiyac-karti">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">Malzeme</span><span class="rozet rozet-uyari">Orta</span></div>
+        <h3 class="ihtiyac-karti-baslik">Battaniye ve kedi kumu</h3>
+        <span class="ihtiyac-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Meram Barınağı</span>
+        <div class="ilerleme" role="progressbar" aria-label="Battaniye ve kedi kumu karşılanma oranı" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14">
+          <span class="ilerleme-soz" style="width:70%"></span>
+          <span class="ilerleme-teslim" style="width:45%"></span>
+        </div>
+        <p class="ilerleme-metin">14 / 20 adet için söz verildi</p>
+        <button class="btn btn-ana" type="button" disabled>Destek olacağım</button>
+      </article>
+      <article class="ihtiyac-karti ihtiyac-karti-karsilandi">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">İlaç</span><span class="rozet rozet-basari">Karşılandı</span></div>
+        <h3 class="ihtiyac-karti-baslik">Antibiyotik (amoksisilin)</h3>
+        <span class="ihtiyac-karti-kurum"><svg class="ikon" aria-hidden="true"><use href="#i-bina"/></svg>Merkez Barınak</span>
+        <div class="ilerleme ilerleme-tamam" role="progressbar" aria-label="Antibiyotik karşılanma oranı" aria-valuemin="0" aria-valuemax="10" aria-valuenow="10">
+          <span class="ilerleme-teslim" style="width:100%"></span>
+        </div>
+        <p class="ilerleme-metin">10 / 10 kutu teslim alındı</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<!-- Beyaz bölüm örneği (anasayfadaki "Acil ihtiyaçlar") -->
+<section class="bolum bolum-beyaz" aria-labelledby="beyaz-bolum-baslik">
+  <div class="konteyner">
+    <div class="bolum-baslik">
+      <div>
+        <h2 id="beyaz-bolum-baslik">Acil ihtiyaçlar</h2>
+        <p>Söz verdiğinde barınak görevlisi seninle iletişime geçer. (<code>.bolum-beyaz</code> içinde ihtiyaç kartı zemin rengini alır.)</p>
+      </div>
+      <a class="baglanti" href="#hayvan-kurum-ihtiyac">Tümünü gör</a>
+    </div>
+    <div class="izgara izgara-genis">
+      <article class="ihtiyac-karti">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">Mama</span><span class="rozet rozet-acil">Yüksek</span></div>
+        <h3 class="ihtiyac-karti-baslik">Yavru kedi maması</h3>
+        <div class="ilerleme" role="progressbar" aria-label="Karşılanma oranı" aria-valuemin="0" aria-valuemax="50" aria-valuenow="20"><span class="ilerleme-soz" style="width:40%"></span></div>
+        <p class="ilerleme-metin">20 / 50 kg için söz verildi</p>
+        <button class="btn btn-ana" type="button">Destek olacağım</button>
+      </article>
+      <article class="ihtiyac-karti">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">İlaç</span><span class="rozet rozet-acil">Yüksek</span></div>
+        <h3 class="ihtiyac-karti-baslik">Antibiyotik (amoksisilin)</h3>
+        <div class="ilerleme" role="progressbar" aria-label="Karşılanma oranı" aria-valuemin="0" aria-valuemax="10" aria-valuenow="2"><span class="ilerleme-soz" style="width:20%"></span></div>
+        <p class="ilerleme-metin">2 / 10 kutu için söz verildi</p>
+        <button class="btn btn-ana" type="button">Destek olacağım</button>
+      </article>
+      <article class="ihtiyac-karti">
+        <div class="ihtiyac-karti-ust"><span class="ihtiyac-karti-tur">Malzeme</span><span class="rozet rozet-uyari">Orta</span></div>
+        <h3 class="ihtiyac-karti-baslik">Battaniye ve kedi kumu</h3>
+        <div class="ilerleme" role="progressbar" aria-label="Karşılanma oranı" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14"><span class="ilerleme-soz" style="width:70%"></span></div>
+        <p class="ilerleme-metin">14 / 20 adet için söz verildi</p>
+        <button class="btn btn-ana" type="button">Destek olacağım</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="konteyner">
+
+  <!-- ===== 12. İlerleme ===== -->
+  <section class="demo-bolum" id="ilerleme">
+    <h2>İlerleme çubuğu</h2>
+    <p class="demo-aciklama">İki katman: teslim alınan (koyu, <code>.ilerleme-teslim</code>) ve söz verilen (açık, <code>.ilerleme-soz</code>). Genişlikler JS ile <code>style.width</code> olarak verilir.</p>
+    <div class="yigin" style="max-width:420px">
+      <div>
+        <span class="demo-etiket">Boş (%0)</span>
+        <div class="ilerleme" role="progressbar" aria-label="Örnek, boş" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+      </div>
+      <div>
+        <span class="demo-etiket">Söz %60, teslim %25</span>
+        <div class="ilerleme" role="progressbar" aria-label="Örnek, kısmi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"><span class="ilerleme-soz" style="width:60%"></span><span class="ilerleme-teslim" style="width:25%"></span></div>
+      </div>
+      <div>
+        <span class="demo-etiket">Tamamı teslim alındı (.ilerleme-tamam)</span>
+        <div class="ilerleme ilerleme-tamam" role="progressbar" aria-label="Örnek, tamam" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="ilerleme-teslim" style="width:100%"></span></div>
+      </div>
+      <ul class="ilerleme-aciklama">
+        <li>Teslim alındı</li>
+        <li class="soz">Söz verildi</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 13. Sekmeler ===== -->
+  <section class="demo-bolum" id="sekmeler">
+    <h2>Sekmeler</h2>
+    <p class="demo-aciklama"><code>.sekmeler</code> + <code>.sekme</code>. Aktif sekme <code>aria-selected="true"</code> (veya bağlantıda <code>aria-current="page"</code>). Sığmayınca yatay kaydırılır. Eşit genişlik için <code>.sekmeler-esit</code>.</p>
+
+    <h3 class="demo-baslik">Durumlar</h3>
+    <div class="sekmeler" role="tablist" aria-label="Sekme durumları">
+      <button class="sekme" role="tab" type="button" aria-selected="true">Aktif</button>
+      <button class="sekme" role="tab" type="button" aria-selected="false">Normal</button>
+      <button class="sekme durum-hover" role="tab" type="button" aria-selected="false">Hover</button>
+      <button class="sekme durum-odak" role="tab" type="button" aria-selected="false">Odak</button>
+      <button class="sekme" role="tab" type="button" aria-selected="false" disabled>Pasif</button>
+    </div>
+
+    <h3 class="demo-baslik">Hesabım (sayılı)</h3>
+    <div class="sekmeler" role="tablist" aria-label="Hesabım">
+      <a class="sekme" role="tab" href="#basvurular" aria-selected="true">Başvurularım <span class="sekme-sayi">2</span></a>
+      <a class="sekme" role="tab" href="#randevular" aria-selected="false">Randevularım <span class="sekme-sayi">1</span></a>
+      <a class="sekme" role="tab" href="#sahiplendiklerim" aria-selected="false">Sahiplendiklerim</a>
+      <a class="sekme" role="tab" href="#destek" aria-selected="false">Destek sözlerim</a>
+      <a class="sekme" role="tab" href="#profil" aria-selected="false">Profil</a>
+    </div>
+
+    <h3 class="demo-baslik">Panel başvuruları (.sekmeler-esit)</h3>
+    <div class="demo-cerceve demo-telefon" style="background:var(--kart)">
+      <div class="sekmeler sekmeler-esit" role="tablist" aria-label="Başvuru durumları">
+        <button class="sekme" role="tab" type="button" aria-selected="true">Bekleyen (3)</button>
+        <button class="sekme" role="tab" type="button" aria-selected="false">Onaylanan (1)</button>
+        <button class="sekme" role="tab" type="button" aria-selected="false">Reddedilen (1)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 14. Tablo ===== -->
+  <section class="demo-bolum" id="tablo">
+    <h2>Tablo</h2>
+    <p class="demo-aciklama"><code>.tablo-kap</code> &gt; <code>table.tablo</code>. Her hücrede <code>data-etiket</code> bulunur; 768px altında satırlar karta dönüşür, ilk hücre (<code>.tablo-baslik-hucre</code>) kartın başlığı olur. Pencereyi daraltarak deneyin.</p>
+
+    <h3 class="demo-baslik">Aşı karnesi</h3>
+    <div class="tablo-kap">
+      <table class="tablo">
+        <caption class="gizli-erisim">Pamuk'un aşı karnesi</caption>
+        <thead>
+          <tr><th scope="col">Aşı</th><th scope="col">Yapıldığı tarih</th><th scope="col">Uygulayan klinik</th><th scope="col">Sonraki doz</th><th scope="col">Durum</th><th scope="col"><span class="gizli-erisim">Belge</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Aşı">Karma aşı (1. doz)</td>
+            <td data-etiket="Yapıldığı tarih">12.03.2026</td>
+            <td data-etiket="Uygulayan klinik">Şifa Veteriner Kliniği</td>
+            <td data-etiket="Sonraki doz">—</td>
+            <td data-etiket="Durum"><span class="rozet rozet-basari">Güncel</span></td>
+            <td data-etiket="Belge"><a href="#tablo">Belgeyi gör</a></td>
+          </tr>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Aşı">Kuduz</td>
+            <td data-etiket="Yapıldığı tarih">15.04.2026</td>
+            <td data-etiket="Uygulayan klinik">Şifa Veteriner Kliniği</td>
+            <td data-etiket="Sonraki doz">15.04.2027</td>
+            <td data-etiket="Durum"><span class="rozet rozet-basari">Güncel</span></td>
+            <td data-etiket="Belge">—</td>
+          </tr>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Aşı">İç-dış parazit</td>
+            <td data-etiket="Yapıldığı tarih">20.10.2026</td>
+            <td data-etiket="Uygulayan klinik">Merkez Barınak</td>
+            <td data-etiket="Sonraki doz">01.12.2026</td>
+            <td data-etiket="Durum"><span class="rozet rozet-uyari">Yaklaşıyor</span></td>
+            <td data-etiket="Belge">—</td>
+          </tr>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Aşı">Lösemi (FeLV)</td>
+            <td data-etiket="Yapıldığı tarih">01.10.2025</td>
+            <td data-etiket="Uygulayan klinik">Şifa Veteriner Kliniği</td>
+            <td data-etiket="Sonraki doz">01.10.2026</td>
+            <td data-etiket="Durum"><span class="rozet rozet-acil">Gecikmiş</span></td>
+            <td data-etiket="Belge">—</td>
+          </tr>
+          <tr class="soluk">
+            <td class="tablo-baslik-hucre" data-etiket="Aşı">Karma aşı (rapel)</td>
+            <td data-etiket="Yapıldığı tarih">—</td>
+            <td data-etiket="Uygulayan klinik">—</td>
+            <td data-etiket="Sonraki doz">—</td>
+            <td data-etiket="Durum"><span class="rozet rozet-notr">Henüz yapılmadı</span></td>
+            <td data-etiket="Belge">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="demo-baslik">Eylemli, tıklanabilir satırlar (yönetim)</h3>
+    <div class="tablo-kap">
+      <table class="tablo tablo-tiklanir">
+        <caption class="gizli-erisim">Hayvan türleri</caption>
+        <thead>
+          <tr><th scope="col">Tür</th><th scope="col" class="tablo-sayi">Hayvan sayısı</th><th scope="col"><span class="gizli-erisim">İşlemler</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Tür">Kedi</td>
+            <td class="tablo-sayi" data-etiket="Hayvan sayısı">9</td>
+            <td><div class="tablo-eylem"><button class="btn btn-cerceve" type="button"><svg class="ikon" aria-hidden="true"><use href="#i-duzenle"/></svg>Düzenle</button><button class="btn btn-tehlike" type="button" disabled>Sil</button></div></td>
+          </tr>
+          <tr>
+            <td class="tablo-baslik-hucre" data-etiket="Tür">Tavşan</td>
+            <td class="tablo-sayi" data-etiket="Hayvan sayısı">0</td>
+            <td><div class="tablo-eylem"><button class="btn btn-cerceve" type="button"><svg class="ikon" aria-hidden="true"><use href="#i-duzenle"/></svg>Düzenle</button><button class="btn btn-tehlike" type="button">Sil</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 15. Saat seçici ===== -->
+  <section class="demo-bolum" id="saat-secici">
+    <h2>Saat seçici</h2>
+    <p class="demo-aciklama"><code>.saat-gunler</code> gün sekmeleri, <code>.saat-izgara</code> saat ızgarası (radyo düğmeleri). Dolu saatler <code>disabled</code>.</p>
+    <div class="saat-secici" style="max-width:640px">
+      <div class="saat-gunler" role="tablist" aria-label="Teslim günü">
+        <button class="saat-gun" role="tab" type="button" aria-selected="true"><span class="saat-gun-ad">Cum</span><span class="saat-gun-no">20</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun" role="tab" type="button" aria-selected="false"><span class="saat-gun-ad">Cmt</span><span class="saat-gun-no">21</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun durum-hover" role="tab" type="button" aria-selected="false"><span class="saat-gun-ad">Paz</span><span class="saat-gun-no">22</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun durum-odak" role="tab" type="button" aria-selected="false"><span class="saat-gun-ad">Pzt</span><span class="saat-gun-no">23</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun" role="tab" type="button" aria-selected="false" disabled><span class="saat-gun-ad">Sal</span><span class="saat-gun-no">24</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun" role="tab" type="button" aria-selected="false"><span class="saat-gun-ad">Çar</span><span class="saat-gun-no">25</span><span class="saat-gun-ay">Kas</span></button>
+        <button class="saat-gun" role="tab" type="button" aria-selected="false"><span class="saat-gun-ad">Per</span><span class="saat-gun-no">26</span><span class="saat-gun-ay">Kas</span></button>
+      </div>
+      <p class="form-yardim" style="margin-top:-8px">Cum: seçili · Paz: hover · Pzt: odak · Sal: uygun saat yok (pasif)</p>
+      <fieldset>
+        <legend class="form-etiket" style="margin-bottom:8px">20 Kasım Cuma – teslim saati</legend>
+        <div class="saat-izgara">
+          <label><input type="radio" name="saat"><span><strong>10:00</strong><small>2 yer</small></span></label>
+          <label><input type="radio" name="saat" checked><span><strong>10:30</strong><small>1 yer</small></span></label>
+          <label><input type="radio" name="saat"><span class="durum-hover"><strong>11:00</strong><small>2 yer</small></span></label>
+          <label><input type="radio" name="saat"><span class="durum-odak"><strong>11:30</strong><small>3 yer</small></span></label>
+          <label><input type="radio" name="saat" disabled><span><strong>13:00</strong><small>Dolu</small></span></label>
+          <label><input type="radio" name="saat" disabled><span><strong>13:30</strong><small>Dolu</small></span></label>
+          <label><input type="radio" name="saat"><span><strong>14:00</strong><small>2 yer</small></span></label>
+          <label><input type="radio" name="saat"><span><strong>14:30</strong><small>1 yer</small></span></label>
+        </div>
+        <p class="form-yardim demo-ust-bosluk">10:30: seçili · 11:00: hover · 11:30: odak · 13:00 ve 13:30: dolu (pasif)</p>
+      </fieldset>
+      <fieldset>
+        <legend class="form-etiket" style="margin-bottom:8px">Hata durumu</legend>
+        <div class="saat-izgara hatali">
+          <label><input type="radio" name="saat2" aria-describedby="saat-hata"><span><strong>15:00</strong><small>2 yer</small></span></label>
+          <label><input type="radio" name="saat2" aria-describedby="saat-hata"><span><strong>15:30</strong><small>2 yer</small></span></label>
+          <label><input type="radio" name="saat2" aria-describedby="saat-hata"><span><strong>16:00</strong><small>1 yer</small></span></label>
+        </div>
+        <p class="form-hata demo-ust-bosluk" id="saat-hata">Devam etmek için bir saat seçin.</p>
+      </fieldset>
+    </div>
+  </section>
+
+  <!-- ===== 16. Zaman çizelgesi ===== -->
+  <section class="demo-bolum" id="zaman-cizelgesi">
+    <h2>Zaman çizelgesi</h2>
+    <p class="demo-aciklama">Başvuru → Onay → Randevu → Teslim. Adım sınıfları: <code>.zc-tamam</code>, <code>.zc-aktif</code> (sıradaki), <code>.zc-hata</code> (reddedildi / iptal / gelmedi). Boş <code>.zc-nokta</code> sıra numarasını gösterir.</p>
+    <div class="yigin" style="max-width:560px;gap:20px">
+      <div class="kart">
+        <span class="demo-etiket">Beklemede</span>
+        <ol class="zaman-cizelgesi" aria-label="Başvuru süreci">
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Başvuru</span><span class="zc-tarih">16.11.2026</span></li>
+          <li class="zc-aktif" aria-current="step"><span class="zc-nokta"></span><span class="zc-baslik">Onay</span><span class="zc-tarih">Bekleniyor</span></li>
+          <li><span class="zc-nokta"></span><span class="zc-baslik">Randevu</span></li>
+          <li><span class="zc-nokta"></span><span class="zc-baslik">Teslim</span></li>
+        </ol>
+      </div>
+      <div class="kart">
+        <span class="demo-etiket">Onaylandı, randevu bekleniyor</span>
+        <ol class="zaman-cizelgesi" aria-label="Başvuru süreci">
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Başvuru</span><span class="zc-tarih">16.11.2026</span></li>
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Onay</span><span class="zc-tarih">18.11.2026</span></li>
+          <li class="zc-aktif" aria-current="step"><span class="zc-nokta"></span><span class="zc-baslik">Randevu</span><span class="zc-tarih">Saat seçin</span></li>
+          <li><span class="zc-nokta"></span><span class="zc-baslik">Teslim</span></li>
+        </ol>
+        <a class="btn btn-ana btn-blok demo-ust-bosluk" href="#zaman-cizelgesi" style="margin-top:16px"><svg class="ikon" aria-hidden="true"><use href="#i-takvim"/></svg>Teslim alma randevusu al</a>
+      </div>
+      <div class="kart">
+        <span class="demo-etiket">Teslim edildi</span>
+        <ol class="zaman-cizelgesi" aria-label="Başvuru süreci">
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Başvuru</span><span class="zc-tarih">16.11.2026</span></li>
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Onay</span><span class="zc-tarih">18.11.2026</span></li>
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Randevu</span><span class="zc-tarih">22.11 · 14:30</span></li>
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Teslim</span><span class="zc-tarih">22.11.2026</span></li>
+        </ol>
+      </div>
+      <div class="kart">
+        <span class="demo-etiket">Reddedildi</span>
+        <ol class="zaman-cizelgesi" aria-label="Başvuru süreci">
+          <li class="zc-tamam"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg></span><span class="zc-baslik">Başvuru</span><span class="zc-tarih">14.11.2026</span></li>
+          <li class="zc-hata"><span class="zc-nokta"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></span><span class="zc-baslik">Reddedildi</span><span class="zc-tarih">15.11.2026</span></li>
+          <li><span class="zc-nokta"></span><span class="zc-baslik">Randevu</span></li>
+          <li><span class="zc-nokta"></span><span class="zc-baslik">Teslim</span></li>
+        </ol>
+        <div class="uyari-kutusu uyari-kutusu-acil" style="margin-top:16px">
+          <svg class="ikon" aria-hidden="true"><use href="#i-bilgi"/></svg>
+          <div class="uyari-kutusu-metin"><strong>Görevli notu</strong><p>Bu dostumuz için başka bir başvuru onaylandı.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 17. Uyarı kutusu, boş durum, hata, iskelet ===== -->
+  <section class="demo-bolum" id="durumlar">
+    <h2>Uyarı kutusu, boş durum, hata, iskelet</h2>
+
+    <h3 class="demo-baslik">.uyari-kutusu</h3>
+    <div class="yigin" style="max-width:640px">
+      <div class="uyari-kutusu uyari-kutusu-acil" role="alert">
+        <svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>
+        <div class="uyari-kutusu-metin"><strong>2 gecikmiş aşı var</strong><p>Duman (Kuduz) ve Mırmır (Karma aşı) aşılarının tarihi geçti.</p></div>
+      </div>
+      <div class="uyari-kutusu uyari-kutusu-uyari">
+        <svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>
+        <div class="uyari-kutusu-metin"><strong>Onaylamadan önce</strong><p>Hayvan sahiplendirildi olarak işaretlenecek ve bu hayvana ait diğer bekleyen başvurular otomatik reddedilecek.</p></div>
+      </div>
+      <div class="uyari-kutusu uyari-kutusu-basari" role="status">
+        <svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg>
+        <div class="uyari-kutusu-metin"><strong>Başvurun alındı</strong><p>Görevli değerlendirince sana haber vereceğiz.</p></div>
+      </div>
+      <div class="uyari-kutusu uyari-kutusu-bilgi">
+        <svg class="ikon" aria-hidden="true"><use href="#i-bilgi"/></svg>
+        <div class="uyari-kutusu-metin"><p>Kimliğinizi yanınızda getirin.</p></div>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">.bos-durum ve hata durumu</h3>
+    <div class="izgara izgara-genis">
+      <div class="bos-durum">
+        <span class="bos-durum-ikon"><svg class="ikon" aria-hidden="true"><use href="#i-pati"/></svg></span>
+        <h3>Bu filtrelere uyan hayvan yok</h3>
+        <p>Filtreleri temizleyerek tüm yuva arayan dostları görebilirsin.</p>
+        <a class="btn btn-cerceve" href="#durumlar">Filtreleri temizle</a>
+      </div>
+      <div class="bos-durum bos-durum-hata" role="alert">
+        <span class="bos-durum-ikon"><svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg></span>
+        <h3>Bir sorun oluştu</h3>
+        <p>Bağlantı kurulamadı, tekrar deneyin.</p>
+        <button class="btn btn-ana" type="button"><svg class="ikon" aria-hidden="true"><use href="#i-yenile"/></svg>Tekrar dene</button>
+      </div>
+    </div>
+
+    <h3 class="demo-baslik">.iskelet ve .donen</h3>
+    <div class="izgara izgara-genis">
+      <div class="kart" aria-hidden="true">
+        <div class="iskelet iskelet-baslik"></div>
+        <div class="liste">
+          <div class="liste-satiri"><span class="iskelet iskelet-kare"></span><span class="liste-satiri-metin"><span class="iskelet iskelet-metin"></span><span class="iskelet iskelet-metin iskelet-metin-kisa"></span></span></div>
+          <div class="liste-satiri"><span class="iskelet iskelet-kare"></span><span class="liste-satiri-metin"><span class="iskelet iskelet-metin"></span><span class="iskelet iskelet-metin iskelet-metin-kisa"></span></span></div>
+        </div>
+      </div>
+      <div class="kart satir" style="justify-content:center" role="status">
+        <span class="donen" aria-hidden="true"></span>
+        <span class="metin-ikincil">Yükleniyor…</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 18. Toast ===== -->
+  <section class="demo-bolum demo-toastlar" id="toast">
+    <h2>Toast</h2>
+    <p class="demo-aciklama">Gerçek kullanımda <code>.toast-kap</code> ekranın altında sabittir (panelde alt menünün üstünde, masaüstünde sağ altta). Burada statik gösteriliyor.</p>
+    <div class="toast-kap" role="region" aria-label="Bildirimler">
+      <div class="toast toast-basari" role="status">
+        <svg class="ikon" aria-hidden="true"><use href="#i-onay"/></svg>
+        <span class="toast-metin">Pamuk kaydedildi.</span>
+        <button class="btn btn-ikon" type="button" aria-label="Bildirimi kapat"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </div>
+      <div class="toast toast-hata" role="alert">
+        <svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>
+        <span class="toast-metin">Bağlantı kurulamadı, tekrar deneyin.</span>
+        <button class="btn btn-ikon" type="button" aria-label="Bildirimi kapat"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </div>
+      <div class="toast toast-uyari" role="status">
+        <svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>
+        <span class="toast-metin">Kaydedilmemiş değişiklikler var.</span>
+        <button class="btn btn-ikon" type="button" aria-label="Bildirimi kapat"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </div>
+      <div class="toast toast-bilgi" role="status">
+        <svg class="ikon" aria-hidden="true"><use href="#i-bilgi"/></svg>
+        <span class="toast-metin">Aktif kurum: Merkez Barınak</span>
+        <button class="btn btn-ikon" type="button" aria-label="Bildirimi kapat"><svg class="ikon ikon-kucuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 19. Modal ve çekmece ===== -->
+  <section class="demo-bolum" id="modal">
+    <h2>Modal ve çekmece</h2>
+    <p class="demo-aciklama">JS ile <code>.acik</code> sınıfı eklenerek açılır. Bu sayfada JS olmadığı için <code>:target</code> ile de açılabilir. Çekmece mobilde alttan, 768px üstünde sağdan açılır.</p>
+    <div class="satir">
+      <a class="btn btn-tehlike" href="#ornek-modal">Onay modalını aç</a>
+      <a class="btn btn-cerceve" href="#ornek-detay-modal">Detay modalını aç</a>
+      <a class="btn btn-cerceve" href="#ornek-cekmece"><svg class="ikon" aria-hidden="true"><use href="#i-daha"/></svg>"Daha fazla" çekmecesini aç</a>
+      <a class="btn btn-cerceve" href="#ornek-filtre"><svg class="ikon" aria-hidden="true"><use href="#i-filtre"/></svg>Filtreler (3)</a>
+    </div>
+
+    <h3 class="demo-baslik">Statik önizleme</h3>
+    <div class="izgara izgara-genis">
+      <div class="demo-cerceve demo-katman">
+        <div class="modal-arka">
+          <div class="modal" role="dialog" aria-modal="false" aria-labelledby="onizleme-modal-baslik">
+            <div class="modal-baslik">
+              <h2 id="onizleme-modal-baslik">Başvuruyu onayla</h2>
+              <button class="btn btn-ikon" type="button" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+            </div>
+            <div class="modal-govde">
+              <p>Elif Yıldız'ın Pamuk için yaptığı başvuru onaylanacak.</p>
+              <div class="uyari-kutusu uyari-kutusu-uyari">
+                <svg class="ikon" aria-hidden="true"><use href="#i-uyari"/></svg>
+                <div class="uyari-kutusu-metin"><p>Hayvan sahiplendirildi olarak işaretlenecek ve diğer bekleyen başvurular otomatik reddedilecek.</p></div>
+              </div>
+            </div>
+            <div class="modal-alt">
+              <button class="btn btn-cerceve" type="button">Vazgeç</button>
+              <button class="btn btn-ana" type="button">Onayla</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cerceve demo-katman">
+        <div class="cekmece-arka">
+          <div class="cekmece" role="dialog" aria-modal="false" aria-labelledby="onizleme-cekmece-baslik">
+            <div class="cekmece-baslik">
+              <h2 id="onizleme-cekmece-baslik">Daha fazla</h2>
+              <button class="btn btn-ikon" type="button" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+            </div>
+            <div class="cekmece-govde">
+              <ul class="cekmece-menu">
+                <li><a href="#modal"><svg class="ikon" aria-hidden="true"><use href="#i-asi"/></svg>Aşı gir</a></li>
+                <li><a href="#modal"><svg class="ikon" aria-hidden="true"><use href="#i-ihtiyac"/></svg>İhtiyaçlar</a></li>
+                <li><a href="#modal"><svg class="ikon" aria-hidden="true"><use href="#i-belge"/></svg>Sahiplendirmeler</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 20. Sayfalama, ekmek kırıntısı ===== -->
+  <section class="demo-bolum" id="gezinme">
+    <h2>Sayfalama ve ekmek kırıntısı</h2>
+    <nav class="ekmek" aria-label="Konum">
+      <ol>
+        <li><a href="/index.html">Anasayfa</a></li>
+        <li><a href="/hayvanlar.html">Hayvanlar</a></li>
+        <li><span aria-current="page">Pamuk</span></li>
+      </ol>
+    </nav>
+    <nav aria-label="Sayfalar">
+      <ul class="sayfalama">
+        <li><a href="#gezinme" aria-disabled="true">Önceki</a></li>
+        <li><a href="#gezinme" aria-current="page">1</a></li>
+        <li><a href="#gezinme">2</a></li>
+        <li><a href="#gezinme">3</a></li>
+        <li><span class="sayfalama-bosluk" aria-hidden="true">…</span></li>
+        <li><a href="#gezinme">8</a></li>
+        <li><a href="#gezinme">Sonraki</a></li>
+      </ul>
+    </nav>
+  </section>
+
+  <!-- ===== 21. Düzen parçaları ===== -->
+  <section class="demo-bolum" id="duzen">
+    <h2>Düzen parçaları</h2>
+    <p class="demo-aciklama">Faz 2'de <code>layout.js</code> bu parçaları yerleştirecek. Üst menü, acil bandı ve alt bilgi bu sayfanın kendisinde çalışır halde; aşağıda mobil menü ve panel parçaları telefon çerçevesinde gösteriliyor.</p>
+
+    <div class="izgara izgara-genis" style="align-items:start">
+      <div>
+        <h3 class="demo-baslik">Mobil menü (hamburger açık)</h3>
+        <div class="demo-cerceve demo-telefon">
+          <header class="ust-menu">
+            <div class="ust-menu-ic" style="padding-inline:16px">
+              <a class="logo" href="/index.html"><svg class="ikon" aria-hidden="true"><use href="#i-pati"/></svg>PatiPortal</a>
+              <div class="ust-menu-eylem">
+                <button class="btn btn-ikon btn-sade" type="button" aria-label="Menüyü kapat" aria-expanded="true"><svg class="ikon ikon-buyuk" aria-hidden="true"><use href="#i-kapat"/></svg></button>
+              </div>
+            </div>
+            <nav class="ust-menu-mobil" aria-label="Mobil menü">
+              <ul>
+                <li><a href="/hayvanlar.html" aria-current="page">Hayvanlar</a></li>
+                <li><a href="/kurumlar.html">Kurumlar</a></li>
+                <li><a href="/ihtiyaclar.html">Acil İhtiyaçlar</a></li>
+                <li><a href="/index.html#nasil">Nasıl Sahiplenirim?</a></li>
+                <li><a href="/hesabim.html">Hesabım</a></li>
+                <li><a href="/panel/index.html">Panel</a></li>
+              </ul>
+            </nav>
+          </header>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="demo-baslik">Panel ana ekranı</h3>
+        <div class="demo-cerceve demo-telefon">
+          <div class="panel-ust">
+            <div class="panel-ust-ic">
+              <div>
+                <p class="panel-ust-etiket">Görevli paneli</p>
+                <h1>Merhaba, Ayşe</h1>
+                <div class="kurum-secici">
+                  <label class="gizli-erisim" for="demo-kurum">Aktif kurum</label>
+                  <select id="demo-kurum">
+                    <option>Merkez Barınak</option>
+                    <option>Şifa Veteriner Kliniği</option>
+                  </select>
+                </div>
+              </div>
+              <a class="btn btn-ikon" href="/index.html" aria-label="Siteye dön"><svg class="ikon ikon-buyuk" aria-hidden="true"><use href="#i-cikis"/></svg></a>
+            </div>
+          </div>
+          <div style="padding:16px">
+            <div class="sayac-izgara">
+              <a class="sayac sayac-uyari" href="#duzen"><span class="sayac-deger">5</span><span class="sayac-etiket">Bekleyen başvuru</span></a>
+              <a class="sayac" href="#duzen"><span class="sayac-deger">3</span><span class="sayac-etiket">Bugünkü randevu</span></a>
+            </div>
+            <a class="btn btn-ana btn-buyuk btn-blok" href="#duzen" style="margin-top:16px"><svg class="ikon" aria-hidden="true"><use href="#i-arti"/></svg>Hayvan Ekle</a>
+          </div>
+          <nav class="panel-alt-menu" aria-label="Panel menüsü">
+            <ul>
+              <li><a href="/panel/index.html" aria-current="page"><svg class="ikon" aria-hidden="true"><use href="#i-ev"/></svg>Ana sayfa</a></li>
+              <li><a href="/panel/hayvanlar.html"><svg class="ikon" aria-hidden="true"><use href="#i-pati"/></svg>Hayvanlar</a></li>
+              <li><a href="/panel/basvurular.html"><svg class="ikon" aria-hidden="true"><use href="#i-belge"/></svg>Başvurular</a></li>
+              <li><a href="/panel/randevular.html"><svg class="ikon" aria-hidden="true"><use href="#i-takvim"/></svg>Randevular</a></li>
+              <li><button type="button" aria-haspopup="dialog"><svg class="ikon" aria-hidden="true"><use href="#i-daha"/></svg>Daha fazla</button></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="demo-baslik">Üst çubuk (alt sayfalar)</h3>
+        <div class="demo-cerceve demo-telefon">
+          <div class="ust-cubuk">
+            <div class="ust-cubuk-ic">
+              <a class="btn btn-ikon btn-sade" href="/panel/index.html" aria-label="Geri"><svg class="ikon ikon-buyuk" aria-hidden="true"><use href="#i-geri"/></svg></a>
+              <h1>Yeni hayvan</h1>
+              <span class="ust-cubuk-ek">~30 sn</span>
+            </div>
+          </div>
+          <div style="padding:16px">
+            <div class="form-alan" style="margin:0">
+              <label for="demo-ad">Adı</label>
+              <input id="demo-ad" type="text" placeholder="Örn. Pamuk">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Alt bilgi layout.js ile yerleştirilir -->
+<div id="alt-bilgi"></div>
+
+<!-- ===== :target ile açılan gerçek modal ve çekmeceler ===== -->
+<div class="modal-arka" id="ornek-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ornek-modal-baslik">
+    <div class="modal-baslik">
+      <h2 id="ornek-modal-baslik">Hesabını silmek istiyor musun?</h2>
+      <a class="btn btn-ikon" href="#modal" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></a>
+    </div>
+    <div class="modal-govde">
+      <p>Başvuruların, randevuların ve destek sözlerin silinecek. Bu işlem geri alınamaz.</p>
+      <div class="form-alan">
+        <label for="m-onay">Onaylamak için <strong>SİL</strong> yazın</label>
+        <input id="m-onay" type="text" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-alt">
+      <a class="btn btn-cerceve" href="#modal">Vazgeç</a>
+      <a class="btn btn-tehlike-dolu" href="#modal">Hesabımı sil</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-arka" id="ornek-detay-modal">
+  <div class="modal modal-genis" role="dialog" aria-modal="true" aria-labelledby="ornek-detay-baslik">
+    <div class="modal-baslik">
+      <h2 id="ornek-detay-baslik">Başvuru detayı</h2>
+      <a class="btn btn-ikon" href="#modal" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></a>
+    </div>
+    <div class="modal-govde">
+      <dl class="bilgi-tablosu">
+        <div><dt>Başvuran</dt><dd>Elif Yıldız</dd></div>
+        <div><dt>Telefon</dt><dd><a href="tel:+905321234567">0532 123 45 67</a></dd></div>
+        <div><dt>Şehir / ilçe</dt><dd>Konya / Selçuklu</dd></div>
+        <div><dt>Ev tipi</dt><dd>Apartman</dd></div>
+        <div><dt>Evde başka hayvan</dt><dd>Yok</dd></div>
+        <div><dt>Önceki deneyim</dt><dd>Daha önce kedi baktı</dd></div>
+      </dl>
+      <h3 style="font-size:16px;margin:16px 0 4px">Neden sahiplenmek istiyor?</h3>
+      <p class="metin-ikincil">Evden çalışıyorum, gün boyu yanında olabilirim. Daha önce 8 yıl bir kedimiz vardı.</p>
+    </div>
+    <div class="modal-alt">
+      <a class="btn btn-tehlike" href="#modal">Reddet</a>
+      <a class="btn btn-ana" href="#modal">Onayla</a>
+    </div>
+  </div>
+</div>
+
+<div class="cekmece-arka" id="ornek-cekmece">
+  <a class="cekmece-kapat-alan" href="#modal" aria-label="Çekmeceyi kapat" tabindex="-1"></a>
+  <div class="cekmece" role="dialog" aria-modal="true" aria-labelledby="ornek-cekmece-baslik">
+    <div class="cekmece-baslik">
+      <h2 id="ornek-cekmece-baslik">Daha fazla</h2>
+      <a class="btn btn-ikon" href="#modal" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></a>
+    </div>
+    <div class="cekmece-govde">
+      <ul class="cekmece-menu">
+        <li><a href="/panel/asi.html"><svg class="ikon" aria-hidden="true"><use href="#i-asi"/></svg>Aşı gir</a></li>
+        <li><a href="/panel/ihtiyaclar.html"><svg class="ikon" aria-hidden="true"><use href="#i-ihtiyac"/></svg>İhtiyaçlar</a></li>
+        <li><a href="/panel/teslim-saatleri.html"><svg class="ikon" aria-hidden="true"><use href="#i-saat"/></svg>Teslim saatleri</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="cekmece-arka" id="ornek-filtre">
+  <a class="cekmece-kapat-alan" href="#modal" aria-label="Filtreleri kapat" tabindex="-1"></a>
+  <div class="cekmece" role="dialog" aria-modal="true" aria-labelledby="ornek-filtre-baslik">
+    <div class="cekmece-baslik">
+      <h2 id="ornek-filtre-baslik">Filtreler</h2>
+      <a class="btn btn-ikon" href="#modal" aria-label="Kapat"><svg class="ikon" aria-hidden="true"><use href="#i-kapat"/></svg></a>
+    </div>
+    <div class="cekmece-govde">
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Tür</legend>
+        <div class="secim-grubu secim-grubu-hap">
+          <label><input type="radio" name="cf-tur" checked><span>Hepsi</span></label>
+          <label><input type="radio" name="cf-tur"><span>Kedi</span></label>
+          <label><input type="radio" name="cf-tur"><span>Köpek</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Cinsiyet</legend>
+        <label class="secim-kutusu"><input type="checkbox" checked> Dişi</label>
+        <label class="secim-kutusu"><input type="checkbox" checked> Erkek</label>
+      </fieldset>
+      <fieldset class="form-alan">
+        <legend class="form-etiket">Sağlık</legend>
+        <label class="secim-kutusu"><input type="checkbox" checked> Aşıları tam</label>
+        <label class="secim-kutusu"><input type="checkbox"> Kısırlaştırılmış</label>
+      </fieldset>
+    </div>
+    <div class="cekmece-alt">
+      <a class="btn btn-cerceve" href="#modal">Temizle</a>
+      <a class="btn btn-ana" href="#modal">34 hayvanı göster</a>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/static/js/sayfalar/bilesenler.js"></script>
+</body>
+</html>
