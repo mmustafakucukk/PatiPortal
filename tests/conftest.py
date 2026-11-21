@@ -18,7 +18,7 @@ from types import SimpleNamespace
 import pytest
 
 from app import create_app
-from app.extensions import db, login_manager
+from app.extensions import db
 from app.models import (
     AcilIhtiyac, AsiGerekliligi, AsiTuru, Hayvan, HayvanAsisi, HayvanTuru, Kullanici, Kurum,
     KurumGorevlisi, simdi,
@@ -26,18 +26,11 @@ from app.models import (
 from app.sabitler import Aciliyet, Cinsiyet, IhtiyacTuru, KurumTuru, Rol
 
 
-def _kullanici_yukle(kullanici_id):
-    return db.session.get(Kullanici, int(kullanici_id))
-
-
 @pytest.fixture
 def app(tmp_path):
     uygulama = create_app("testing")
     uygulama.config["UPLOAD_KLASORU"] = str(tmp_path / "uploads")
-    # create_app()'teki user_loader şimdilik None döndürüyor (Bölüm 3, Adım 3'te bağlanacak).
-    # Testlerde giriş yapmış kullanıcıyı kullanabilmek için gerçek yükleyiciyi bağlıyoruz.
-    # Abdulhafız user_loader'ı bağlayınca bu satır silinebilir.
-    login_manager.user_loader(_kullanici_yukle)
+
     with uygulama.app_context():
         db.create_all()
     yield uygulama

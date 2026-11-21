@@ -89,3 +89,18 @@ class SahiplendirmeTamamlaSemasi(TemelSema):
         load_default="",
         validate=validate.Length(max=1000),
     )
+
+from app.sabitler import BasvuruDurumu
+from app.schemas.ortak import Sema, secim, tam_sayi
+
+
+class BasvuruFiltreSemasi(Sema):
+    durum = secim(BasvuruDurumu)
+    animal_id = tam_sayi(en_az=1)
+    kurum_id = tam_sayi(en_az=1)
+
+from app.sabitler import RandevuDurumu
+
+
+class RandevuFiltreSemasi(Sema):
+    durum = secim(RandevuDurumu)
