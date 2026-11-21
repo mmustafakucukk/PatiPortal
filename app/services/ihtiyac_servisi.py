@@ -141,6 +141,24 @@ def destek_durumu_degistir(talep, yeni_durum):
     return talep
 
 
+def destegimi_iptal_et(talep):
+    """
+    Kullanıcı kendi verdiği destek sözünü iptal eder. Sadece hesabıyla verdiği sözler
+    iptal edilebilir (giriş yapmadan verilen sözün sahibi bilinmez; onu görevli iptal eder).
+    Teslim edilmiş söz iptal edilemez.
+    """
+    if talep.kullanici_id != current_user.id:
+        raise ApiHatasi("Sadece kendi destek sözünüzü iptal edebilirsiniz.", 403)
+    if talep.durum == DestekDurumu.IPTAL:
+        raise ApiHatasi("Bu destek sözü zaten iptal edilmiş.", 409)
+    if talep.durum == DestekDurumu.TESLIM_EDILDI:
+        raise ApiHatasi("Teslim edilmiş destek sözü iptal edilemez.", 409)
+    talep.durum = DestekDurumu.IPTAL
+    logla(Islem.DESTEK_IPTAL_EDILDI, talep, f"{talep.ihtiyac.baslik}: kullanıcı iptal etti")
+    db.session.commit()
+    return talep
+
+
 def kullanicinin_destekleri():
     """Kullanıcılar sekmesi: giriş yapmış kullanıcının verdiği destek sözleri."""
     talepler = db.session.scalars(

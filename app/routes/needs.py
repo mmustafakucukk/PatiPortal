@@ -10,6 +10,7 @@ DELETE /api/needs/<id>                  Görevli        Siler (destek sözü yok
 POST   /api/needs/<id>/pledges          Herkes         Destek sözü verir (dakikada en fazla 10)
 GET    /api/needs/<id>/pledges          Görevli        Gelen sözler ve iletişim bilgileri
 PATCH  /api/pledges/<id>/durum          Görevli        Sözün durumu (teslim_edildi / iptal)
+PATCH  /api/pledges/<id>/iptal          Giriş yapmış   Kullanıcı kendi sözünü iptal eder
 GET    /api/pledges/me                  Giriş yapmış   Kullanıcının kendi destek sözleri
 """
 
@@ -102,6 +103,14 @@ def destek_durumu(talep_id):
                          secenekler=[joinedload(DestekTalebi.ihtiyac)])
     veri = dogrula(DestekDurumSemasi, request.get_json(silent=True))
     return basarili_yanit(ihtiyac_servisi.destek_durumu_degistir(talep, veri["durum"]).to_dict(iletisim=True))
+
+
+@needs_bp.patch("/pledges/<int:talep_id>/iptal")
+@giris_gerekli
+def destegimi_iptal_et(talep_id):
+    talep = bul_veya_404(DestekTalebi, talep_id, "Destek talebi bulunamadı.",
+                         secenekler=[joinedload(DestekTalebi.ihtiyac)])
+    return basarili_yanit(ihtiyac_servisi.destegimi_iptal_et(talep).to_dict(iletisim=True))
 
 
 @needs_bp.get("/pledges/me")

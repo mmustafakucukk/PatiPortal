@@ -189,3 +189,106 @@ def test_zorunlu_asilari_belirleme(admin_istemci, ziyaretci, veri):
 
     turler = {t["ad"]: t for t in ziyaretci.get("/api/hayvan-turleri").json["veri"]}
     assert len(turler["Kedi"]["zorunlu_asilar"]) == 2
+
+
+# ------------------------------------------------------------------ Kurum filtresi
+def test_panel_listeleri_kurum_filtresi_ve_kurum_bilgisi(gorevli_istemci, admin_istemci, hayvan_ekle, asi_ekle, veri):
+    def gecikmis_ekle(ad, kurum_id):
+        hayvan_id = hayvan_ekle(ad=ad, kurum_id=kurum_id)
+        asi_ekle(hayvan_id, veri.karma_id, BUGUN - timedelta(days=400), BUGUN - timedelta(days=5))
+
+    gecikmis_ekle("Bizim", veri.kurum_id)
+    gecikmis_ekle("Onların", veri.diger_kurum_id)
+
+    def adlar(istemci, sorgu=""):
+        yanit = istemci.get(f"/api/vaccinations/gecikmis{sorgu}")
+        assert yanit.status_code == 200, yanit.json
+        return [a["hayvan"]["ad"] for a in yanit.json["veri"]]
+
+    assert sorted(adlar(admin_istemci)) == ["Bizim", "Onların"]
+    assert adlar(admin_istemci, f"?kurum_id={veri.diger_kurum_id}") == ["Onların"]
+    assert adlar(gorevli_istemci, f"?kurum_id={veri.kurum_id}") == ["Bizim"]
+    assert gorevli_istemci.get(f"/api/vaccinations/gecikmis?kurum_id={veri.diger_kurum_id}").status_code == 403
+    assert gorevli_istemci.get(f"/api/vaccinations/yaklasan?kurum_id={veri.diger_kurum_id}").status_code == 403
+
+    kayit = admin_istemci.get(f"/api/vaccinations/gecikmis?kurum_id={veri.kurum_id}").json["veri"][0]
+    assert kayit["hayvan"]["kurum"] == {"id": veri.kurum_id, "ad": "Test Barınağı", "tur": "barinak"}
+
+
+# ------------------------------------------------------------------ Tekrar aralığı → sonraki doz önerisi
+def test_tekrar_araligi_ve_otomatik_sonraki_doz(admin_istemci, gorevli_istemci, ziyaretci, hayvan_ekle, veri):
+    url = f"/api/hayvan-turleri/{veri.kedi_id}/zorunlu-asilar"
+    yanit = admin_istemci.put(url, json={"asilar": [
+        {"asi_turu_id": veri.karma_id, "tekrar_araligi_gun": 365},
+        {"asi_turu_id": veri.kuduz_id},
+    ]})
+    assert yanit.status_code == 200, yanit.json
+    zorunlular = {a["ad"]: a["tekrar_araligi_gun"] for a in yanit.json["veri"]["zorunlu_asilar"]}
+    assert zorunlular == {"Karma": 365, "Kuduz": None}
+
+    turler = ziyaretci.get(f"/api/vaccinations/turler?hayvan_turu_id={veri.kedi_id}").json["veri"]
+    assert {t["ad"]: t["tekrar_araligi_gun"] for t in turler} == {"Karma": 365, "Kuduz": None}
+
+    hayvan_id = hayvan_ekle()
+    asi_url = f"/api/animals/{hayvan_id}/vaccinations"
+    # Sonraki doz boş → aralıktan hesaplanır (frontend boşsa null gönderiyor)
+    yanit = gorevli_istemci.post(asi_url, json={
+        "asi_turu_id": veri.karma_id, "uygulama_tarihi": _gun(-10), "sonraki_tarih": None,
+    })
+    assert yanit.json["veri"]["sonraki_tarih"] == _gun(355)
+    # Elle girilen tarih ezilmez
+    yanit = gorevli_istemci.post(asi_url, json={
+        "asi_turu_id": veri.karma_id, "uygulama_tarihi": _gun(-1), "sonraki_tarih": _gun(30),
+    })
+    assert yanit.json["veri"]["sonraki_tarih"] == _gun(30)
+    # Aralığı tanımlı olmayan aşıda sonraki doz boş kalır
+    yanit = gorevli_istemci.post(asi_url, json={"asi_turu_id": veri.kuduz_id})
+    assert yanit.json["veri"]["sonraki_tarih"] is None
+
+    # Eski biçim (sadece id listesi) mevcut aralıkları korur
+    yanit = admin_istemci.put(url, json={"asi_turu_idleri": [veri.karma_id]})
+    assert yanit.json["veri"]["zorunlu_asilar"] == [{"id": veri.karma_id, "ad": "Karma", "tekrar_araligi_gun": 365}]
+
+
+def test_zorunlu_asilar_bicim_hatalari(admin_istemci, veri):
+    url = f"/api/hayvan-turleri/{veri.kedi_id}/zorunlu-asilar"
+    assert admin_istemci.put(url, json={}).status_code == 400
+    assert admin_istemci.put(url, json={"asi_turu_idleri": [], "asilar": []}).status_code == 400
+    yanit = admin_istemci.put(url, json={"asilar": [{"asi_turu_id": veri.karma_id, "tekrar_araligi_gun": 0}]})
+    assert yanit.status_code == 400
+
+
+# ------------------------------------------------------------------ Tür düzenleme / silme
+def test_hayvan_turu_guncelle_ve_sil(admin_istemci, gorevli_istemci, ziyaretci, hayvan_ekle, veri):
+    yanit = admin_istemci.put(f"/api/hayvan-turleri/{veri.kopek_id}", json={"ad": "Köpekler"})
+    assert yanit.status_code == 200 and yanit.json["veri"]["ad"] == "Köpekler"
+    assert admin_istemci.put(f"/api/hayvan-turleri/{veri.kopek_id}", json={"ad": "kedi"}).status_code == 409
+    assert admin_istemci.put(f"/api/hayvan-turleri/{veri.kopek_id}", json={"ad": "Köpekler"}).status_code == 200
+    assert gorevli_istemci.put(f"/api/hayvan-turleri/{veri.kopek_id}", json={"ad": "X"}).status_code == 403
+
+    hayvan_ekle(tur_id=veri.kedi_id)
+    yanit = admin_istemci.delete(f"/api/hayvan-turleri/{veri.kedi_id}")
+    assert yanit.status_code == 409 and "1 hayvan" in yanit.json["hata"]
+
+    assert admin_istemci.delete(f"/api/hayvan-turleri/{veri.kopek_id}").status_code == 200
+    assert [t["ad"] for t in ziyaretci.get("/api/hayvan-turleri").json["veri"]] == ["Kedi"]
+    assert admin_istemci.delete("/api/hayvan-turleri/999").status_code == 404
+
+
+def test_asi_turu_guncelle_ve_sil(admin_istemci, gorevli_istemci, ziyaretci, hayvan_ekle, asi_ekle, veri):
+    url = f"/api/vaccinations/turler/{veri.kuduz_id}"
+    yanit = admin_istemci.put(url, json={"aciklama": "Yılda bir"})
+    assert yanit.status_code == 200
+    assert (yanit.json["veri"]["ad"], yanit.json["veri"]["aciklama"]) == ("Kuduz", "Yılda bir")
+    assert admin_istemci.put(url, json={"ad": "KARMA"}).status_code == 409
+    assert admin_istemci.put(url, json={"ad": None}).status_code == 400
+    assert gorevli_istemci.delete(url).status_code == 403
+
+    # Uygulanmış aşı silinemez
+    asi_ekle(hayvan_ekle(), veri.karma_id, BUGUN)
+    assert admin_istemci.delete(f"/api/vaccinations/turler/{veri.karma_id}").status_code == 409
+
+    # Hiç uygulanmamış aşı silinir, türlerin zorunlu listesinden de çıkar
+    assert admin_istemci.delete(url).status_code == 200
+    kedi = next(t for t in ziyaretci.get("/api/hayvan-turleri").json["veri"] if t["id"] == veri.kedi_id)
+    assert [a["ad"] for a in kedi["zorunlu_asilar"]] == ["Karma"]

@@ -83,6 +83,7 @@ def test_giris_yapmis_kullanicinin_bilgileri_otomatik_dolar(kullanici_istemci, i
     assert len(sozlerim) == 1
     assert sozlerim[0]["telefon"] == "05550000000"
     assert sozlerim[0]["ihtiyac"]["baslik"] == "Kedi maması"
+    assert sozlerim[0]["ihtiyac"]["birim"] == "kg"
 
 
 # ------------------------------------------------------------------ Görevli işlemleri
@@ -120,3 +121,32 @@ def test_yetkisiz_ihtiyac_islemleri(ziyaretci, diger_gorevli_istemci, ihtiyac_ek
     assert ziyaretci.post("/api/needs", json={"tur": "mama", "baslik": "X", "miktar": 1}).status_code == 401
     ihtiyac_id = ihtiyac_ekle()
     assert diger_gorevli_istemci.patch(f"/api/needs/{ihtiyac_id}/karsilandi").status_code == 403
+
+
+def test_kullanici_kendi_sozunu_iptal_eder(app, kullanici_istemci, admin_istemci, ziyaretci, ihtiyac_ekle):
+    ihtiyac_id = ihtiyac_ekle(miktar=10)
+    yanit = kullanici_istemci.post(f"/api/needs/{ihtiyac_id}/pledges", json={"miktar": 4, "kvkk_onay": True})
+    talep_id = yanit.json["veri"]["id"]
+    anonim_id = ziyaretci.post(f"/api/needs/{ihtiyac_id}/pledges", json=DESTEK).json["veri"]["id"]
+    url = f"/api/pledges/{talep_id}/iptal"
+
+    assert ziyaretci.patch(url).status_code == 401
+    assert admin_istemci.patch(url).status_code == 403  # başkasının sözü (admin de olsa bu uç kişisel)
+    assert kullanici_istemci.patch(f"/api/pledges/{anonim_id}/iptal").status_code == 403
+
+    yanit = kullanici_istemci.patch(url)
+    assert yanit.status_code == 200 and yanit.json["veri"]["durum"] == "iptal"
+    assert kullanici_istemci.patch(url).status_code == 409
+    assert _ihtiyac(ziyaretci, ihtiyac_id)["toplam_soz"] == 6  # sadece anonim söz kaldı
+
+    with app.app_context():
+        islem = db.session.scalars(db.select(IslemKaydi.islem_turu).order_by(IslemKaydi.id.desc())).first()
+        assert islem == "destek_iptal_edildi"
+
+
+def test_teslim_edilmis_soz_iptal_edilemez(kullanici_istemci, gorevli_istemci, ihtiyac_ekle):
+    ihtiyac_id = ihtiyac_ekle()
+    talep_id = kullanici_istemci.post(f"/api/needs/{ihtiyac_id}/pledges",
+                                      json={"miktar": 1, "kvkk_onay": True}).json["veri"]["id"]
+    gorevli_istemci.patch(f"/api/pledges/{talep_id}/durum", json={"durum": "teslim_edildi"})
+    assert kullanici_istemci.patch(f"/api/pledges/{talep_id}/iptal").status_code == 409

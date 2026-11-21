@@ -7,10 +7,12 @@ PUT    /api/vaccinations/<id>           Görevli  Düzeltir (sadece gönderilen 
 DELETE /api/vaccinations/<id>           Görevli  Siler
 POST   /api/vaccinations/<id>/belge     Görevli  Belge yükler (multipart, alan adı: "belge")
 GET    /api/vaccinations/<id>/belge     Herkes   Belgeyi indirir
-GET    /api/vaccinations/yaklasan?gun=7 Görevli  Önümüzdeki N günde aşısı gelenler
-GET    /api/vaccinations/gecikmis       Görevli  Tarihi geçmiş ama yapılmamış aşılar
-GET    /api/vaccinations/turler         Herkes   Aşı türleri (?hayvan_turu_id= ile "zorunlu" bilgisi)
+GET    /api/vaccinations/yaklasan?gun=7 Görevli  Önümüzdeki N günde aşısı gelenler (?kurum_id=)
+GET    /api/vaccinations/gecikmis       Görevli  Tarihi geçmiş ama yapılmamış aşılar (?kurum_id=)
+GET    /api/vaccinations/turler         Herkes   Aşı türleri (?hayvan_turu_id= ile zorunlu + tekrar aralığı)
 POST   /api/vaccinations/turler         Admin    Yeni aşı türü
+PUT    /api/vaccinations/turler/<id>    Admin    Aşı türünü düzenler (ad, aciklama)
+DELETE /api/vaccinations/turler/<id>    Admin    Siler (hiç uygulanmadıysa)
 """
 
 from flask import Blueprint, request, send_from_directory
@@ -18,7 +20,9 @@ from sqlalchemy.orm import joinedload
 
 from app.models import Hayvan, HayvanAsisi
 from app.schemas.ortak import dogrula, sorgu_parametreleri
-from app.schemas.vaccination import AsiSemasi, AsiTuruFiltreSemasi, AsiTuruSemasi, YaklasanAsiFiltreSemasi
+from app.schemas.vaccination import (
+    AsiSemasi, AsiTuruFiltreSemasi, AsiTuruSemasi, GecikmisAsiFiltreSemasi, YaklasanAsiFiltreSemasi,
+)
 from app.services import asi_servisi, dosyalar, tur_servisi
 from app.services.ortak import bul_veya_404
 from app.utils.decorators import admin_gerekli, gorevli_gerekli
@@ -84,13 +88,14 @@ def belge_indir(asi_id):
 @gorevli_gerekli
 def yaklasan_asilar():
     filtre = dogrula(YaklasanAsiFiltreSemasi, sorgu_parametreleri(request.args))
-    return basarili_yanit(asi_servisi.yaklasan_asilar(filtre["gun"]))
+    return basarili_yanit(asi_servisi.yaklasan_asilar(filtre["gun"], filtre.get("kurum_id")))
 
 
 @vaccinations_bp.get("/vaccinations/gecikmis")
 @gorevli_gerekli
 def gecikmis_asilar():
-    return basarili_yanit(asi_servisi.gecikmis_asilar())
+    filtre = dogrula(GecikmisAsiFiltreSemasi, sorgu_parametreleri(request.args))
+    return basarili_yanit(asi_servisi.gecikmis_asilar(filtre.get("kurum_id")))
 
 
 @vaccinations_bp.get("/vaccinations/turler")
@@ -104,3 +109,18 @@ def asi_turleri():
 def asi_turu_ekle():
     veri = dogrula(AsiTuruSemasi, request.get_json(silent=True))
     return basarili_yanit(tur_servisi.asi_turu_ekle(veri).to_dict(), 201)
+
+
+@vaccinations_bp.put("/vaccinations/turler/<int:asi_turu_id>")
+@admin_gerekli
+def asi_turu_guncelle(asi_turu_id):
+    asi_turu = tur_servisi.asi_turunu_yukle(asi_turu_id)
+    degisiklikler = dogrula(AsiTuruSemasi, request.get_json(silent=True), kismi=True)
+    return basarili_yanit(tur_servisi.asi_turu_guncelle(asi_turu, degisiklikler).to_dict())
+
+
+@vaccinations_bp.delete("/vaccinations/turler/<int:asi_turu_id>")
+@admin_gerekli
+def asi_turu_sil(asi_turu_id):
+    tur_servisi.asi_turu_sil(tur_servisi.asi_turunu_yukle(asi_turu_id))
+    return basarili_yanit()

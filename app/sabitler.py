@@ -37,6 +37,15 @@ class HayvanDurumu(StrEnum):
     SAHIPLENDIRILDI = "sahiplendirildi"
 
 
+class HayvanSiralama(StrEnum):
+    """GET /api/animals?siralama=..."""
+    YENI = "yeni"      # en son eklenen önce (varsayılan)
+    ESKI = "eski"      # en uzun süredir bekleyen önce
+    AD = "ad"          # ada göre A→Z
+    GENC = "genc"      # en genç önce (doğum tarihi bilinmeyenler sonda)
+    YASLI = "yasli"    # en yaşlı önce (doğum tarihi bilinmeyenler sonda)
+
+
 class AsiDurumu(StrEnum):
     """Hesaplanan bir değerdir, veritabanında saklanmaz (bkz. asi_servisi.asi_durumu)."""
     TAMAMLANDI = "tamamlandi"    # sonraki doz yok ya da sonraki doz zaten yapılmış
@@ -98,7 +107,10 @@ class Islem(StrEnum):
     IHTIYAC_SILINDI = "ihtiyac_silindi"
     DESTEK_VERILDI = "destek_verildi"
     DESTEK_DURUMU_DEGISTI = "destek_durumu_degisti"
-    TUR_EKLENDI = "tur_eklendi"
+    DESTEK_IPTAL_EDILDI = "destek_iptal_edildi"
+    TUR_EKLENDI = "tur_eklendi"          # hayvan türü veya aşı türü (hedef_tablo'dan anlaşılır)
+    TUR_GUNCELLENDI = "tur_guncellendi"
+    TUR_SILINDI = "tur_silindi"
     ZORUNLU_ASILAR_DEGISTI = "zorunlu_asilar_degisti"
 
     # Bölüm 3 (Abdulhafız): kimlik doğrulama, kullanıcı/kurum, başvuru ve teslimat
