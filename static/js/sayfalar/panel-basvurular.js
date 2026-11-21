@@ -11,7 +11,7 @@ import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, modalAc, butonBekle,
   formHatalariniGoster, etiket, etiketRozeti, kisaTarih, tarihFormatla, saatFormatla, istegeBagli
 } from '../ui.js';
-import { FOTOGRAF_YOK, kapakUrl } from '../kartlar.js';
+import { FOTOGRAF_YOK_KUCUK, kapakUrl } from '../kartlar.js';
 
 const SEKMELER = {
   bekleyen: { durumlar: ['beklemede'], ad: 'Bekleyen' },
@@ -155,7 +155,7 @@ function basvuruKarti(b) {
   return el('article', { class: 'kart hesap-karti', style: { gap: '12px' } }, [
     el('div', { class: 'hesap-karti-ust' }, [
       el('div', { class: 'ozet-hayvan' }, [
-        el('img', { src: kapakUrl(b.hayvan) || FOTOGRAF_YOK, alt: '', width: '64', height: '64' }),
+        el('img', { src: kapakUrl(b.hayvan) || FOTOGRAF_YOK_KUCUK, alt: '', width: '64', height: '64' }),
         el('div', { class: 'ozet-hayvan-metin' }, [
           el('span', { class: 'ozet-hayvan-ad', style: { fontFamily: 'var(--font-govde)', fontWeight: 600 }, text: basvuran }),
           el('span', { class: 'ozet-hayvan-alt', text: `${b.hayvan?.ad || '—'} için · ${kisaTarih(b.basvuru_tarihi)}` })

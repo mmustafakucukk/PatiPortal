@@ -15,7 +15,7 @@ import {
   hataGoster, hataMetni, toast, formHatalariniGoster, formHatalariniTemizle, butonBekle,
   etiket, etiketRozeti, bugunIso, gunFarki, tarihFormatla
 } from '../ui.js';
-import { FOTOGRAF_YOK, hayvanBilgiMetni, kapakUrl, turAdi } from '../kartlar.js';
+import { FOTOGRAF_YOK_KUCUK, hayvanBilgiMetni, kapakUrl, turAdi } from '../kartlar.js';
 import { fotografKucult } from '../fotograf.js';
 
 const EN_FAZLA_ONERI = 8;
@@ -169,7 +169,7 @@ function onerileriGoster() {
   } else {
     icerikDegistir(oneriler, gorunenOneriler.map((h, i) => {
       const li = el('li', { id: `hayvan-oneri-${h.id}`, role: 'option', 'aria-selected': i === etkinOneri ? 'true' : 'false' }, [
-        el('img', { class: 'kucuk-foto', src: kapakUrl(h) || FOTOGRAF_YOK, alt: '' }),
+        el('img', { class: 'kucuk-foto', src: kapakUrl(h) || FOTOGRAF_YOK_KUCUK, alt: '' }),
         el('span', { class: 'liste-satiri-metin' }, [
           el('span', { class: 'liste-satiri-baslik', style: { fontSize: '16px' }, text: h.ad }),
           el('span', { class: 'liste-satiri-alt', text: [hayvanBilgiMetni(h, { kisir: false }), etiket('durum', h.durum)].filter(Boolean).join(' · ') })
@@ -218,7 +218,7 @@ async function hayvanSec(h) {
   });
   icerikDegistir(secilenKabi, el('div', { class: 'secilen-hayvan' }, [
     el('div', { class: 'ozet-hayvan' }, [
-      el('img', { src: kapakUrl(h) || FOTOGRAF_YOK, alt: '', width: '64', height: '64' }),
+      el('img', { src: kapakUrl(h) || FOTOGRAF_YOK_KUCUK, alt: '', width: '64', height: '64' }),
       el('div', { class: 'ozet-hayvan-metin' }, [
         el('span', { class: 'ozet-hayvan-ad', text: h.ad }),
         el('span', { class: 'ozet-hayvan-alt', text: [hayvanBilgiMetni(h, { kisir: false }), etiket('durum', h.durum)].filter(Boolean).join(' · ') })

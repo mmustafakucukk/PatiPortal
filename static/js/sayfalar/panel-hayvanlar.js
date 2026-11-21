@@ -4,7 +4,7 @@
 // "Yuvasını buldu" elle seçilemez, başvuru onayıyla oluşur.
 // =============================================================================
 import { el, ikon, icerikDegistir, secimParametresi, sayiParametresi } from '../dom.js';
-import { apiGet, apiPatch, apiDelete, ApiHatasi, sayfaliYanit } from '../api.js';
+import { apiGet, apiPatch, apiDelete, ApiHatasi, sayfaliYanit, hayvanTurleriniGetir } from '../api.js';
 import { gorevliGerekli } from '../auth.js';
 import { aktifKurum, KURUM_DEGISTI_OLAYI } from '../kurum.js';
 import { panelUstCubugunuYerlestir, panelMenusunuYerlestir } from '../layout.js';
@@ -12,7 +12,7 @@ import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, onayIste, debounce,
   etiket, etiketRozeti, sayiFormatla
 } from '../ui.js';
-import { FOTOGRAF_YOK, hayvanBilgiMetni, asiRozeti, sayfalama, kapakUrl } from '../kartlar.js';
+import { FOTOGRAF_YOK_KUCUK, hayvanBilgiMetni, asiRozeti, sayfalama, kapakUrl } from '../kartlar.js';
 
 const SAYFA_BOYUTU = 20;
 const TUM_DURUMLAR = ['barinakta', 'tedavide', 'sahiplendirildi'];
@@ -57,7 +57,7 @@ async function baslat() {
   });
 
   try {
-    const turler = await apiGet('/api/hayvan-turleri');
+    const turler = await hayvanTurleriniGetir();
     form.elements.tur.append(...turler.map((t) => el('option', { value: t.id, text: t.ad })));
     if (durum.tur && !turler.some((t) => t.id === durum.tur)) durum.tur = null;
   } catch { /* tür filtresi olmadan devam */ }
@@ -170,7 +170,7 @@ function satir(h) {
   return el('tr', {}, [
     el('td', { class: 'tablo-baslik-hucre', 'data-etiket': 'Hayvan' }, [
       el('div', { class: 'hucre-hayvan' }, [
-        el('img', { class: 'kucuk-foto', src: kapakUrl(h) || FOTOGRAF_YOK, alt: '' }),
+        el('img', { class: 'kucuk-foto', src: kapakUrl(h) || FOTOGRAF_YOK_KUCUK, alt: '' }),
         el('div', {}, [
           el('a', { href: `/panel/hayvan-duzenle.html?id=${h.id}`, style: { color: 'var(--metin)' }, text: h.ad }),
           el('div', { class: 'metin-kucuk metin-ikincil', style: { fontWeight: 400 }, text: hayvanBilgiMetni(h, { kisir: false }) })

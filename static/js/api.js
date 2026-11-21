@@ -164,3 +164,12 @@ async function gercekIstek(yontem, yol, parametreler, govde, formData) {
   }
   return { durum: yanit.status, json };
 }
+
+/**
+ * Hayvan türleri, eklenme sırasıyla (Kedi, Köpek önce gelir).
+ * API ada göre sıralı döndürüyor; açılır listeler ve filtreler bu sırayı kullanır.
+ */
+export async function hayvanTurleriniGetir() {
+  const turler = await apiGet('/api/hayvan-turleri');
+  return [...turler].sort((x, y) => x.id - y.id);
+}

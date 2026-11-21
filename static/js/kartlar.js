@@ -6,6 +6,8 @@ import { el, ikon } from './dom.js';
 import { etiket, etiketRozeti, yasMetni, ihtiyacOranlari, sayiFormatla, tarihFormatla, asiDurumu } from './ui.js';
 
 export const FOTOGRAF_YOK = '/static/img/fotograf-yok.svg';
+/** Küçük görseller (≤ 72px) için yazısız yer tutucu. */
+export const FOTOGRAF_YOK_KUCUK = '/static/img/fotograf-yok-kucuk.svg';
 export const KURUM_YOK = '/static/img/kurum-yok.svg';
 
 /** Tür adı: liste/detayda { id, ad }, başka kayıtların içinde düz metin gelir. */
@@ -106,7 +108,7 @@ export function hayvanOzetSatiri(h, { link = true, ek = null } = {}) {
     ? el('a', { href: `/hayvan.html?id=${encodeURIComponent(h.id)}`, text: h.ad })
     : h.ad;
   return el('div', { class: 'ozet-hayvan' }, [
-    el('img', { src: kapakUrl(h) || FOTOGRAF_YOK, alt: '', width: '72', height: '72' }),
+    el('img', { src: kapakUrl(h) || FOTOGRAF_YOK_KUCUK, alt: '', width: '72', height: '72' }),
     el('div', { class: 'ozet-hayvan-metin' }, [
       el('span', { class: 'ozet-hayvan-ad' }, [ad]),
       el('span', { class: 'ozet-hayvan-alt', text: [hayvanBilgiMetni(h, { kisir: false }) || turAdi(h), kurumAdi(h)].filter(Boolean).join(' · ') }),

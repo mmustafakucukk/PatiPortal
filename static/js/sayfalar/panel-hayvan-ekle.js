@@ -5,7 +5,7 @@
 // hayvan kaydı korunur ve tekrar deneme sunulur.
 // =============================================================================
 import { el, ikon, icerikDegistir } from '../dom.js';
-import { apiGet, apiPost, apiUpload, ApiHatasi } from '../api.js';
+import { apiGet, apiPost, apiUpload, ApiHatasi, hayvanTurleriniGetir } from '../api.js';
 import { gorevliGerekli } from '../auth.js';
 import { aktifKurum, KURUM_DEGISTI_OLAYI } from '../kurum.js';
 import { panelUstCubugunuYerlestir } from '../layout.js';
@@ -92,8 +92,7 @@ function degisikligiIsaretle() {
 // -----------------------------------------------------------------------------
 async function turleriYukle() {
   try {
-    // API ada göre sıralı döner; en eski türler (Kedi, Köpek…) öne alınsın diye kimliğe göre sıralanır
-    turler = (await apiGet('/api/hayvan-turleri')).sort((x, y) => x.id - y.id);
+    turler = await hayvanTurleriniGetir();
   } catch (hata) {
     icerikDegistir(turKabi, el('div', { style: { gridColumn: '1 / -1' } }, [
       el('p', { class: 'form-hata', text: `Türler yüklenemedi: ${hataMetni(hata)}` }),

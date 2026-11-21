@@ -3,7 +3,7 @@
 // Filtreler URL'ye yazılır ve URL'den okunur.
 // =============================================================================
 import { el, icerikDegistir } from '../dom.js';
-import { apiGet, sayfaliYanit } from '../api.js';
+import { apiGet, sayfaliYanit, hayvanTurleriniGetir } from '../api.js';
 import { ustMenuyuYerlestir, altBilgiyiYerlestir } from '../layout.js';
 import { yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, debounce, cekmeceAc, sayiFormatla } from '../ui.js';
 import { hayvanKarti, sayfalama } from '../kartlar.js';
@@ -148,7 +148,7 @@ async function baslat() {
 /** Tür ve kurum seçenekleri API'den gelir; yüklenemezse liste yine çalışır. */
 async function secenekleriYukle() {
   const [turler, kurumlar] = await Promise.all([
-    apiGet('/api/hayvan-turleri').catch(() => []),
+    hayvanTurleriniGetir().catch(() => []),
     apiGet('/api/institutions').catch(() => [])
   ]);
 

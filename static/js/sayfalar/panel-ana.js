@@ -13,7 +13,7 @@ import {
   yukleniyorGoster, hataGoster, hataMetni, etiketRozeti, saatFormatla, goreceliGun,
   tarihFormatla, gunFarki, bugunIso, sayiFormatla
 } from '../ui.js';
-import { FOTOGRAF_YOK, kapakUrl } from '../kartlar.js';
+import { FOTOGRAF_YOK_KUCUK, kapakUrl } from '../kartlar.js';
 
 const SAYACLAR = [
   { anahtar: 'bekleyen_basvuru', etiket: 'Bekleyen başvuru', sinif: 'sayac-uyari', href: '/panel/basvurular.html' },
@@ -126,7 +126,7 @@ async function teslimleriYukle() {
     icerikDegistir(kap, el('ul', { class: 'liste' }, gosterilecek.map((r) => {
       const tel = telLinki(r.basvuran?.telefon);
       return el('li', { class: 'liste-satiri', style: r.durum === 'planlandi' ? null : { opacity: 0.6 } }, [
-        el('img', { class: 'kucuk-foto', src: kapakUrl(r.hayvan) || FOTOGRAF_YOK, alt: '' }),
+        el('img', { class: 'kucuk-foto', src: kapakUrl(r.hayvan) || FOTOGRAF_YOK_KUCUK, alt: '' }),
         el('span', { class: 'liste-satiri-metin' }, [
           el('span', { class: 'liste-satiri-baslik', text: `${saatFormatla(r.teslim_saati.baslangic_saati)} · ${r.hayvan?.ad || '—'}` }),
           el('span', { class: 'liste-satiri-alt', text: r.basvuran?.ad_soyad || '' })
@@ -151,7 +151,7 @@ async function asilariYukle() {
       return;
     }
     icerikDegistir(kap, el('ul', { class: 'liste' }, asilar.map((a) => el('li', { class: 'liste-satiri' }, [
-      el('img', { class: 'kucuk-foto', src: kapakUrl(a.hayvan) || FOTOGRAF_YOK, alt: '' }),
+      el('img', { class: 'kucuk-foto', src: kapakUrl(a.hayvan) || FOTOGRAF_YOK_KUCUK, alt: '' }),
       el('span', { class: 'liste-satiri-metin' }, [
         el('span', { class: 'liste-satiri-baslik', text: a.hayvan?.ad || '—' }),
         el('span', { class: 'liste-satiri-alt', title: tarihFormatla(a.sonraki_tarih), text: `${a.asi_turu.ad} · ${goreceliGun(a.sonraki_tarih)}` })

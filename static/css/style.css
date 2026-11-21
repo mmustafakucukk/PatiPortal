@@ -1381,10 +1381,14 @@ a.hayvan-karti:hover,
 .hayvan-karti-foto {
   position: relative;
   aspect-ratio: 3 / 2;
+  overflow: hidden;
   background: var(--yer-1);
 }
 
+/* Görsel alanı oranı belirler; farklı oranlı fotoğraflar kartı uzatmaz */
 .hayvan-karti-foto img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;

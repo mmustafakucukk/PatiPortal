@@ -79,7 +79,7 @@ function ciz(h) {
         el('h1', { class: 'detay-baslik', text: h.ad }),
         ozet && el('p', { class: 'detay-ozet', text: ozet }),
         bilgiTablosu(h),
-        h.saglik_durumu && [el('h2', { class: 'alt-baslik', text: 'Sağlık durumu' }), el('p', { class: 'detay-metin', text: h.saglik_durumu })],
+        h.saglik_durumu && [el('h2', { class: 'alt-baslik', text: 'Sağlık notu' }), el('p', { class: 'detay-metin', text: h.saglik_durumu })],
         devami && [el('h2', { class: 'alt-baslik', text: 'Karakteri' }), el('p', { class: 'detay-metin', text: devami })],
         sahiplenmeKarti(h),
         kurumKarti(h)

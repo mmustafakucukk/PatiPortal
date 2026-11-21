@@ -5,7 +5,7 @@
 // Zorunlu aşılar Aşı türleri sayfasındaki gereklilik tablosundan düzenlenir.
 // =============================================================================
 import { el, ikon, icerikDegistir } from '../dom.js';
-import { apiGet, apiPost, ApiHatasi, sayfaliYanit } from '../api.js';
+import { apiGet, apiPost, ApiHatasi, sayfaliYanit, hayvanTurleriniGetir } from '../api.js';
 import { yonetimSayfasi } from '../yonetim.js';
 import {
   yukleniyorGoster, hataGoster, bosDurumGoster, hataMetni, toast, modalAc, butonBekle,
@@ -37,7 +37,7 @@ async function hayvanSayisi(turId) {
 async function yukle(vurgulanacakId = null) {
   yukleniyorGoster(liste, 3, 'liste');
   try {
-    const turler = await apiGet('/api/hayvan-turleri');
+    const turler = await hayvanTurleriniGetir();
     if (!turler.length) {
       bosDurumGoster(liste, { baslik: 'Henüz hayvan türü yok', aciklama: 'Hayvan eklemek için önce en az bir tür tanımla.', ikon: 'pati' }, { metin: 'Tür ekle', tikla: turEkleAc });
       return;

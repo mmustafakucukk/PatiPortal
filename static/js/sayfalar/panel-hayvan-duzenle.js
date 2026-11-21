@@ -4,7 +4,7 @@
 // sayfadan çıkılırsa uyarı verilir.
 // =============================================================================
 import { el, ikon, icerikDegistir, sayiParametresi } from '../dom.js';
-import { apiGet, apiPut, apiPatch, apiDelete, apiUpload, ApiHatasi } from '../api.js';
+import { apiGet, apiPut, apiPatch, apiDelete, apiUpload, ApiHatasi, hayvanTurleriniGetir } from '../api.js';
 import { gorevliGerekli, yetkiVarMi, yetkisizGoster } from '../auth.js';
 import { aktifKurum, aktifKurumuDegistir, KURUM_DEGISTI_OLAYI } from '../kurum.js';
 import { panelUstCubugunuYerlestir, panelMenusunuYerlestir } from '../layout.js';
@@ -47,7 +47,7 @@ async function baslat() {
   ]));
 
   try {
-    [hayvan, turler] = await Promise.all([apiGet(`/api/animals/${hayvanId}`), apiGet('/api/hayvan-turleri')]);
+    [hayvan, turler] = await Promise.all([apiGet(`/api/animals/${hayvanId}`), hayvanTurleriniGetir()]);
   } catch (hata) {
     if (hata instanceof ApiHatasi && hata.durum === 404) {
       icerikDegistir(kap, sayfaMesaji({ baslik: 'Hayvan bulunamadı', aciklama: 'Kayıt silinmiş olabilir.', eylemler: [el('a', { class: 'btn btn-ana', href: '/panel/hayvanlar.html', text: 'Hayvanlar' })] }));
