@@ -2,10 +2,10 @@
 Teslim alma saatleri, randevular ve sahiplendirme kayıtları – Bölüm 3 (API.md bölüm 6).
 """
 
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from flask_login import current_user
-from sqlalchemy import exists
+from sqlalchemy import exists, func
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
@@ -19,6 +19,7 @@ from app.models import (
     simdi,
 )
 from app.sabitler import BasvuruDurumu, HayvanDurumu, Islem, RandevuDurumu
+from app.services.asi_servisi import asi_karnesi
 from app.services.hayvan_servisi import hayvan_durumunu_degistir
 from app.services.kurum_yetkisi import kurum_filtresi, kurum_yetkisi_kontrol
 from app.services.ortak import bul_veya_404, logla
@@ -47,19 +48,45 @@ KAYIT_YUKLEME = (
 )
 
 
+def _slot_dolu_haritasi(slot_idleri):
+    """Verilen teslim saati ID'leri için aktif (planlandi) randevu sayısını toplu döner."""
+    if not slot_idleri:
+        return {}
+    satirlar = db.session.execute(
+        db.select(TeslimRandevusu.teslim_saati_id, func.count(TeslimRandevusu.id))
+        .where(
+            TeslimRandevusu.teslim_saati_id.in_(slot_idleri),
+            TeslimRandevusu.durum == RandevuDurumu.PLANLANDI,
+        )
+        .group_by(TeslimRandevusu.teslim_saati_id)
+    ).all()
+    return {slot_id: int(sayi) for slot_id, sayi in satirlar}
+
+
 # ------------------------------------------------------------------ Sözlük dönüştürücüler
-def teslim_saati_sozluge_cevir(saat):
+def teslim_saati_sozluge_cevir(saat, dolu_sayisi=0):
+    kapasite = saat.kapasite or 1
+    kalan = max(kapasite - dolu_sayisi, 0)
     return {
         "id": saat.id,
         "kurum_id": saat.kurum_id,
         "tarih": saat.tarih.isoformat(),
         "baslangic_saati": saat.baslangic_saati.strftime("%H:%M"),
         "bitis_saati": saat.bitis_saati.strftime("%H:%M"),
+        "kapasite": kapasite,
+        "dolu_sayisi": dolu_sayisi,
+        "kalan_kapasite": kalan,
+        "dolu": dolu_sayisi >= kapasite,
         "aktif": saat.aktif,
     }
 
 
-def randevu_sozluge_cevir(randevu, iletisim=False):
+def teslim_saatlerini_sozluge_cevir(saatler):
+    dolu_haritasi = _slot_dolu_haritasi([s.id for s in saatler])
+    return [teslim_saati_sozluge_cevir(s, dolu_haritasi.get(s.id, 0)) for s in saatler]
+
+
+def randevu_sozluge_cevir(randevu, iletisim=False, slot_dolu=0):
     kullanici = randevu.basvuru.kullanici
     basvuran = {
         "id": kullanici.id,
@@ -82,17 +109,33 @@ def randevu_sozluge_cevir(randevu, iletisim=False):
         "olusturma_tarihi": (
             randevu.olusturma_tarihi.isoformat() if randevu.olusturma_tarihi else None
         ),
-        "teslim_saati": teslim_saati_sozluge_cevir(randevu.teslim_saati),
+        "teslim_saati": teslim_saati_sozluge_cevir(randevu.teslim_saati, slot_dolu),
         "hayvan": hayvan_ozet,
         "basvuran": basvuran,
     }
 
 
-def sahiplendirme_sozluge_cevir(kayit):
+def randevulari_sozluge_cevir(randevular, iletisim=False):
+    dolu_haritasi = _slot_dolu_haritasi([r.teslim_saati_id for r in randevular])
+    return [
+        randevu_sozluge_cevir(r, iletisim=iletisim, slot_dolu=dolu_haritasi.get(r.teslim_saati_id, 0))
+        for r in randevular
+    ]
+
+
+def sahiplendirme_sozluge_cevir(kayit, iletisim=False, karne=False):
     hayvan_ozet = kayit.hayvan.ozet()
     hayvan_ozet["kurum"] = kayit.hayvan.kurum.ozet()
 
-    return {
+    sahiplenen = {
+        "id": kayit.kullanici.id,
+        "ad_soyad": kayit.kullanici.ad_soyad,
+        "email": kayit.kullanici.email,
+    }
+    if iletisim:
+        sahiplenen["telefon"] = kayit.kullanici.telefon
+
+    veri = {
         "id": kayit.id,
         "hayvan_id": kayit.hayvan_id,
         "kullanici_id": kayit.kullanici_id,
@@ -101,12 +144,11 @@ def sahiplendirme_sozluge_cevir(kayit):
         "teslim_tarihi": kayit.teslim_tarihi.isoformat() if kayit.teslim_tarihi else None,
         "teslim_notu": kayit.teslim_notu,
         "hayvan": hayvan_ozet,
-        "sahiplenen": {
-            "id": kayit.kullanici.id,
-            "ad_soyad": kayit.kullanici.ad_soyad,
-            "email": kayit.kullanici.email,
-        },
+        "sahiplenen": sahiplenen,
     }
+    if karne:
+        veri["asi_karnesi"] = asi_karnesi(kayit.hayvan)
+    return veri
 
 
 # ------------------------------------------------------------------ Teslim alma saatleri
@@ -136,16 +178,99 @@ def teslim_saati_ekle(kurum_id, veri):
         tarih=veri["tarih"],
         baslangic_saati=veri["baslangic_saati"],
         bitis_saati=veri["bitis_saati"],
+        kapasite=veri.get("kapasite", 1),
         aktif=True,
     )
     db.session.add(saat)
     logla(
         Islem.TESLIM_SAATI_EKLENDI,
         saat,
-        f"{kurum.ad}: {saat.tarih} {saat.baslangic_saati:%H:%M}-{saat.bitis_saati:%H:%M}",
+        f"{kurum.ad}: {saat.tarih} {saat.baslangic_saati:%H:%M}-{saat.bitis_saati:%H:%M} (kapasite={saat.kapasite})",
     )
     db.session.commit()
     return saat
+
+
+def _toplu_slot_adaylari(veri):
+    """Toplu teslim saati isteğini (tarih, baslangic, bitis, kapasite) listesine dönüştürür."""
+    if "saatler" in veri:
+        return [
+            (s["tarih"], s["baslangic_saati"], s["bitis_saati"], s.get("kapasite", 1))
+            for s in veri["saatler"]
+        ]
+
+    adaylar = []
+    secili_gunler = set(veri["gunler"])  # 0=Pazar, 1=Pazartesi ... 6=Cumartesi
+    sure = timedelta(minutes=veri["sure"])
+    kapasite = veri.get("kapasite", 1)
+
+    gun = veri["baslangic_tarihi"]
+    while gun <= veri["bitis_tarihi"]:
+        js_gun = (gun.weekday() + 1) % 7
+        if js_gun in secili_gunler:
+            basla = datetime.combine(gun, veri["baslangic_saati"])
+            son = datetime.combine(gun, veri["bitis_saati"])
+            while basla + sure <= son:
+                bitir = basla + sure
+                adaylar.append((gun, basla.time(), bitir.time(), kapasite))
+                basla = bitir
+        gun += timedelta(days=1)
+
+    return adaylar
+
+
+def teslim_saati_toplu_ekle(kurum_id, veri):
+    kurum = bul_veya_404(Kurum, kurum_id, "Kurum bulunamadı.")
+    kurum_yetkisi_kontrol(kurum.id)
+
+    adaylar = _toplu_slot_adaylari(veri)
+    if not adaylar:
+        raise ApiHatasi("Seçilen tarih ve saat aralığında oluşturulacak teslim saati bulunamadı.", 400)
+    if len(adaylar) > 200:
+        raise ApiHatasi("Tek seferde en fazla 200 teslim saati eklenebilir.", 400)
+
+    bugun = date.today()
+    tarihler = {t for t, _, _, _ in adaylar if t >= bugun}
+    mevcut_anahtarlar = set()
+    if tarihler:
+        mevcutlar = db.session.execute(
+            db.select(TeslimSaati.tarih, TeslimSaati.baslangic_saati, TeslimSaati.bitis_saati).where(
+                TeslimSaati.kurum_id == kurum.id,
+                TeslimSaati.aktif.is_(True),
+                TeslimSaati.tarih.in_(tarihler),
+            )
+        ).all()
+        mevcut_anahtarlar = {(t, b, s) for t, b, s in mevcutlar}
+
+    eklenenler = []
+    atlanan = 0
+    for tarih_degeri, baslangic, bitis, kapasite in adaylar:
+        anahtar = (tarih_degeri, baslangic, bitis)
+        if tarih_degeri < bugun or anahtar in mevcut_anahtarlar:
+            atlanan += 1
+            continue
+        mevcut_anahtarlar.add(anahtar)
+        saat = TeslimSaati(
+            kurum_id=kurum.id,
+            tarih=tarih_degeri,
+            baslangic_saati=baslangic,
+            bitis_saati=bitis,
+            kapasite=kapasite,
+            aktif=True,
+        )
+        db.session.add(saat)
+        eklenenler.append(saat)
+
+    if eklenenler:
+        db.session.flush()
+        logla(
+            Islem.TESLIM_SAATI_EKLENDI,
+            kurum,
+            f"{kurum.ad}: {len(eklenenler)} teslim saati toplu eklendi ({atlanan} atlandı)",
+        )
+        db.session.commit()
+
+    return eklenenler, atlanan
 
 
 def teslim_saati_sil(slot_id):
@@ -211,12 +336,16 @@ def randevu_olustur(veri):
     if saat.tarih < date.today():
         raise ApiHatasi.alan("slot_id", "Geçmiş tarihli bir teslim saati seçilemez.")
 
+    dolu_sayisi = _slot_dolu_haritasi([saat.id]).get(saat.id, 0)
+    if dolu_sayisi >= (saat.kapasite or 1):
+        raise ApiHatasi("Seçilen teslim alma saati dolu.", 409)
+
     not_metni = (veri.get("not_metni") or "").strip() or None
     mevcut = db.session.scalar(
         db.select(TeslimRandevusu).where(TeslimRandevusu.basvuru_id == basvuru.id)
     )
     if mevcut is not None:
-        if mevcut.durum != RandevuDurumu.IPTAL:
+        if mevcut.durum not in (RandevuDurumu.IPTAL, RandevuDurumu.GELMEDI):
             raise ApiHatasi("Bu başvuru için zaten aktif bir randevunuz var.", 409)
         mevcut.teslim_saati_id = saat.id
         mevcut.durum = RandevuDurumu.PLANLANDI
@@ -262,6 +391,11 @@ def kurum_randevulari(filtre):
     if kurum_kosulu is not None:
         sorgu = sorgu.where(kurum_kosulu)
 
+    if filtre.get("kurum_id"):
+        kurum_yetkisi_kontrol(filtre["kurum_id"])
+        sorgu = sorgu.where(TeslimSaati.kurum_id == filtre["kurum_id"])
+    if filtre.get("tarih"):
+        sorgu = sorgu.where(TeslimSaati.tarih == filtre["tarih"])
     if filtre.get("durum"):
         sorgu = sorgu.where(TeslimRandevusu.durum == RandevuDurumu(filtre["durum"]))
 
@@ -287,6 +421,24 @@ def randevu_iptal(randevu_id):
 
     randevu.durum = RandevuDurumu.IPTAL
     logla(Islem.RANDEVU_IPTAL_EDILDI, randevu, f"Randevu #{randevu.id} iptal edildi")
+    db.session.commit()
+    return randevu
+
+
+def randevu_gelmedi(randevu_id):
+    randevu = bul_veya_404(
+        TeslimRandevusu,
+        randevu_id,
+        "Randevu bulunamadı.",
+        secenekler=list(RANDEVU_YUKLEME),
+    )
+    kurum_yetkisi_kontrol(randevu.basvuru.hayvan.kurum_id)
+
+    if randevu.durum != RandevuDurumu.PLANLANDI:
+        raise ApiHatasi("Sadece planlanmış randevular 'gelmedi' olarak işaretlenebilir.", 409)
+
+    randevu.durum = RandevuDurumu.GELMEDI
+    logla(Islem.RANDEVU_GELMEDI, randevu, f"Randevu #{randevu.id} gelmedi olarak işaretlendi")
     db.session.commit()
     return randevu
 
@@ -339,6 +491,24 @@ def sahiplendirme_tamamla(veri):
     )
     db.session.commit()
     return bul_veya_404(SahiplendirmeKaydi, kayit.id, secenekler=list(KAYIT_YUKLEME))
+
+
+def kurum_sahiplendirmeleri(filtre):
+    sorgu = (
+        db.select(SahiplendirmeKaydi)
+        .join(SahiplendirmeKaydi.hayvan)
+        .options(*KAYIT_YUKLEME)
+    )
+    kurum_kosulu = kurum_filtresi(Hayvan.kurum_id)
+    if kurum_kosulu is not None:
+        sorgu = sorgu.where(kurum_kosulu)
+
+    if filtre.get("kurum_id"):
+        kurum_yetkisi_kontrol(filtre["kurum_id"])
+        sorgu = sorgu.where(Hayvan.kurum_id == filtre["kurum_id"])
+
+    sorgu = sorgu.order_by(SahiplendirmeKaydi.teslim_tarihi.desc(), SahiplendirmeKaydi.id.desc())
+    return db.session.scalars(sorgu).all()
 
 
 def benim_sahiplendiklerim():

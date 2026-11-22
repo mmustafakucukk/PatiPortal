@@ -18,7 +18,7 @@ from app.models import (
     SahiplendirmeKaydi,
 )
 from app.sabitler import BasvuruDurumu, HayvanDurumu, IhtiyacDurumu
-from app.services.kurum_yetkisi import kurum_filtresi
+from app.services.kurum_yetkisi import kurum_filtresi, kurum_yetkisi_kontrol
 
 
 def _say(sorgu):
@@ -35,16 +35,27 @@ def kamu_istatistikleri():
         )
     )
     aktif_kurum = _say(db.select(func.count(Kurum.id)).where(Kurum.aktif.is_(True)))
+    acik_ihtiyac = _say(
+        db.select(func.count(AcilIhtiyac.id)).where(
+            AcilIhtiyac.durum == IhtiyacDurumu.ACIK
+        )
+    )
     return {
         "barinaktaki_hayvan": barinaktaki,
         "sahiplendirilen_hayvan": sahiplendirilen,
         "aktif_kurum": aktif_kurum,
+        "acik_ihtiyac": acik_ihtiyac,
     }
 
 
-def panel_istatistikleri():
-    kurum_kosulu_hayvan = kurum_filtresi(Hayvan.kurum_id)
-    kurum_kosulu_ihtiyac = kurum_filtresi(AcilIhtiyac.kurum_id)
+def panel_istatistikleri(kurum_id=None):
+    if kurum_id is not None:
+        kurum_yetkisi_kontrol(kurum_id)
+        kurum_kosulu_hayvan = Hayvan.kurum_id == kurum_id
+        kurum_kosulu_ihtiyac = AcilIhtiyac.kurum_id == kurum_id
+    else:
+        kurum_kosulu_hayvan = kurum_filtresi(Hayvan.kurum_id)
+        kurum_kosulu_ihtiyac = kurum_filtresi(AcilIhtiyac.kurum_id)
 
     def _hayvan_sayisi(durum=None):
         sorgu = db.select(func.count(Hayvan.id))
@@ -131,6 +142,7 @@ def panel_istatistikleri():
         "toplam_hayvan": _hayvan_sayisi(),
         "barinaktaki_hayvan": _hayvan_sayisi(HayvanDurumu.BARINAKTA),
         "tedavideki_hayvan": _hayvan_sayisi(HayvanDurumu.TEDAVIDE),
+        "rezerve_hayvan": _hayvan_sayisi(HayvanDurumu.REZERVE),
         "sahiplendirilen_hayvan": _hayvan_sayisi(HayvanDurumu.SAHIPLENDIRILDI),
         "bekleyen_basvuru": _say(bekleyen_sorgu),
         "acik_ihtiyac": _say(acik_ihtiyac_sorgu),

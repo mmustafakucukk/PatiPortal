@@ -149,7 +149,7 @@ def test_basvuru_onay_hayvani_gunceller_ve_diger_basvurulari_reddeder(
     onay = gorevli_istemci.put(f"/api/applications/{b1}/onayla")
     assert onay.status_code == 200
     assert onay.get_json()["veri"]["durum"] == BasvuruDurumu.ONAYLANDI
-    assert onay.get_json()["veri"]["hayvan"]["durum"] == HayvanDurumu.SAHIPLENDIRILDI
+    assert onay.get_json()["veri"]["hayvan"]["durum"] == HayvanDurumu.REZERVE
 
     # Tekrar onaylama veya reddetme 409 döner
     assert gorevli_istemci.put(f"/api/applications/{b1}/onayla").status_code == 409
@@ -157,7 +157,7 @@ def test_basvuru_onay_hayvani_gunceller_ve_diger_basvurulari_reddeder(
 
     with app.app_context():
         hayvan = db.session.get(Hayvan, hayvan_id)
-        assert hayvan.durum == HayvanDurumu.SAHIPLENDIRILDI
+        assert hayvan.durum == HayvanDurumu.REZERVE
 
         diger = db.session.get(SahiplendirmeBasvurusu, b2)
         assert diger.durum == BasvuruDurumu.REDDEDILDI

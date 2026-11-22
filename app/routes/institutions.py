@@ -1,13 +1,14 @@
 """
 Kurumlar ve görevli atama – Bölüm 3 (API.md bölüm 4)
 
-GET    /api/institutions                         Herkes  Kurumları listeler (?tur)
-GET    /api/institutions/<id>                    Herkes  Kurum detayı
-POST   /api/institutions                         Admin   Yeni barınak / klinik ekler
-PUT    /api/institutions/<id>                    Admin   Kurum bilgilerini günceller
-GET    /api/institutions/<id>/staff              Admin   Kurumun görevlilerini listeler
-POST   /api/institutions/<id>/staff              Admin   Kuruma görevli atar
-DELETE /api/institutions/<id>/staff/<user_id>    Admin   Görevlinin yetkisini kaldırır
+GET    /api/institutions                         Herkes               Kurumları listeler (?tur, ?il, ?ilce)
+GET    /api/institutions/<id>                    Herkes               Kurum detayı
+POST   /api/institutions                         Admin                Yeni barınak / klinik ekler
+PUT    /api/institutions/<id>                    Admin                Kurum bilgilerini günceller
+DELETE /api/institutions/<id>                    Admin                Bağlı kaydı olmayan kurumu siler
+GET    /api/institutions/<id>/staff              Admin / Kurum Yön.   Kurumun görevlilerini listeler
+POST   /api/institutions/<id>/staff              Admin / Kurum Yön.   Kuruma görevli atar (user_id veya email)
+DELETE /api/institutions/<id>/staff/<user_id>    Admin / Kurum Yön.   Görevlinin yetkisini kaldırır
 """
 
 from flask import Blueprint, request
@@ -21,7 +22,7 @@ from app.schemas.user import (
     KurumOlusturSemasi,
 )
 from app.services import kurum_servisi
-from app.utils.decorators import ROL_ADMIN, admin_gerekli
+from app.utils.decorators import ROL_ADMIN, admin_gerekli, gorevli_gerekli
 from app.utils.responses import basarili_yanit
 
 institutions_bp = Blueprint("institutions", __name__, url_prefix="/api/institutions")
@@ -62,14 +63,21 @@ def kurum_guncelle(kurum_id):
     return basarili_yanit(kurum.to_dict())
 
 
-@institutions_bp.get("/<int:kurum_id>/staff")
+@institutions_bp.delete("/<int:kurum_id>")
 @admin_gerekli
+def kurum_sil(kurum_id):
+    kurum_servisi.kurum_sil(kurum_id)
+    return basarili_yanit({"mesaj": "Kurum silindi."})
+
+
+@institutions_bp.get("/<int:kurum_id>/staff")
+@gorevli_gerekli
 def gorevli_listele(kurum_id):
     return basarili_yanit(kurum_servisi.kurum_gorevlileri(kurum_id))
 
 
 @institutions_bp.post("/<int:kurum_id>/staff")
-@admin_gerekli
+@gorevli_gerekli
 def gorevli_ata(kurum_id):
     veri = dogrula(KurumGorevliAtaSemasi, request.get_json(silent=True))
     atama = kurum_servisi.gorevli_ata(kurum_id, veri)
@@ -77,7 +85,7 @@ def gorevli_ata(kurum_id):
 
 
 @institutions_bp.delete("/<int:kurum_id>/staff/<int:kullanici_id>")
-@admin_gerekli
+@gorevli_gerekli
 def gorevli_cikar(kurum_id, kullanici_id):
     kurum_servisi.gorevli_cikar(kurum_id, kullanici_id)
     return basarili_yanit({"mesaj": "Görevlinin kurum yetkisi kaldırıldı."})

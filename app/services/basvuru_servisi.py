@@ -3,11 +3,18 @@ Sahiplendirme başvuruları iş kuralları – Bölüm 3 (API.md bölüm 5).
 """
 
 from flask_login import current_user
+from sqlalchemy import exists
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.models import Hayvan, SahiplendirmeBasvurusu, simdi
-from app.sabitler import BasvuruDurumu, HayvanDurumu, Islem
+from app.models import (
+    Hayvan,
+    SahiplendirmeBasvurusu,
+    SahiplendirmeKaydi,
+    TeslimRandevusu,
+    simdi,
+)
+from app.sabitler import BasvuruDurumu, HayvanDurumu, Islem, RandevuDurumu
 from app.services.hayvan_servisi import hayvan_durumunu_degistir
 from app.services.kurum_yetkisi import kurum_filtresi, kurum_yetkisi_kontrol
 from app.services.ortak import bul_veya_404, logla
@@ -20,7 +27,26 @@ YUKLEME = (
     joinedload(SahiplendirmeBasvurusu.hayvan).joinedload(Hayvan.kurum),
     joinedload(SahiplendirmeBasvurusu.hayvan).selectinload(Hayvan.fotograflar),
     joinedload(SahiplendirmeBasvurusu.kullanici),
+    joinedload(SahiplendirmeBasvurusu.randevu).joinedload(TeslimRandevusu.teslim_saati),
 )
+
+
+def _randevu_ozeti(randevu):
+    if randevu is None:
+        return None
+    saat = randevu.teslim_saati
+    return {
+        "id": randevu.id,
+        "teslim_saati_id": randevu.teslim_saati_id,
+        "durum": randevu.durum,
+        "not_metni": randevu.not_metni,
+        "olusturma_tarihi": (
+            randevu.olusturma_tarihi.isoformat() if randevu.olusturma_tarihi else None
+        ),
+        "tarih": saat.tarih.isoformat() if saat else None,
+        "baslangic_saati": saat.baslangic_saati.strftime("%H:%M") if saat else None,
+        "bitis_saati": saat.bitis_saati.strftime("%H:%M") if saat else None,
+    }
 
 
 def basvuru_sozluge_cevir(basvuru, iletisim=False):
@@ -50,6 +76,7 @@ def basvuru_sozluge_cevir(basvuru, iletisim=False):
         ),
         "hayvan": hayvan_ozet,
         "basvuran": basvuran,
+        "randevu": _randevu_ozeti(basvuru.randevu),
     }
 
 
@@ -158,7 +185,8 @@ def basvuru_onayla(basvuru_id):
     basvuru.degerlendiren_id = current_user.id
     basvuru.degerlendirme_tarihi = zaman
 
-    hayvan_durumunu_degistir(hayvan, HayvanDurumu.SAHIPLENDIRILDI)
+    # Onaylanan hayvan fiziksel teslime kadar 'rezerve' durumuna geçer
+    hayvan_durumunu_degistir(hayvan, HayvanDurumu.REZERVE)
     logla(
         Islem.BASVURU_ONAYLANDI,
         basvuru,
@@ -204,6 +232,43 @@ def basvuru_reddet(basvuru_id, veri):
         Islem.BASVURU_REDDEDILDI,
         basvuru,
         f"Başvuru #{basvuru.id} reddedildi" + (f" ({not_metni})" if not_metni else ""),
+    )
+    db.session.commit()
+    return basvuru
+
+
+def basvuru_iptal(basvuru_id):
+    basvuru = bul_veya_404(
+        SahiplendirmeBasvurusu,
+        basvuru_id,
+        "Başvuru bulunamadı.",
+        secenekler=list(YUKLEME),
+    )
+
+    if basvuru.kullanici_id != current_user.id:
+        raise ApiHatasi("Sadece kendi başvurunuzu iptal edebilirsiniz.", 403)
+
+    if basvuru.durum not in (BasvuruDurumu.BEKLEMEDE, BasvuruDurumu.ONAYLANDI):
+        raise ApiHatasi("Sadece beklemedeki veya teslim edilmemiş onaylı başvurular iptal edilebilir.", 409)
+
+    if basvuru.durum == BasvuruDurumu.ONAYLANDI:
+        teslim_edilmis = db.session.scalar(
+            db.select(exists().where(SahiplendirmeKaydi.basvuru_id == basvuru.id))
+        )
+        if teslim_edilmis:
+            raise ApiHatasi("Teslimatı tamamlanmış bir başvuru iptal edilemez.", 409)
+
+        if basvuru.randevu is not None and basvuru.randevu.durum == RandevuDurumu.PLANLANDI:
+            basvuru.randevu.durum = RandevuDurumu.IPTAL
+
+        if basvuru.hayvan.durum == HayvanDurumu.REZERVE:
+            hayvan_durumunu_degistir(basvuru.hayvan, HayvanDurumu.BARINAKTA)
+
+    basvuru.durum = BasvuruDurumu.IPTAL
+    logla(
+        Islem.BASVURU_IPTAL_EDILDI,
+        basvuru,
+        f"Başvuru #{basvuru.id} kullanıcı tarafından iptal edildi",
     )
     db.session.commit()
     return basvuru

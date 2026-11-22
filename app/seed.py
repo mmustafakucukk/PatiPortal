@@ -73,6 +73,8 @@ def veritabanini_doldur(sifirla=False):
     merkez = Kurum(
         ad="Konya Merkez Hayvan Barınağı",
         tur=KurumTuru.BARINAK,
+        il="Konya",
+        ilce="Selçuklu",
         adres="Selçuklu, Konya",
         telefon="0332 222 10 10",
         email="merkez@patiportal.local",
@@ -80,6 +82,8 @@ def veritabanini_doldur(sifirla=False):
     selcuklu = Kurum(
         ad="Selçuklu Geçici Bakımevi",
         tur=KurumTuru.BARINAK,
+        il="Konya",
+        ilce="Selçuklu",
         adres="Bosna Hersek Mah., Selçuklu / Konya",
         telefon="0332 222 20 20",
         email="selcuklu@patiportal.local",
@@ -87,6 +91,8 @@ def veritabanini_doldur(sifirla=False):
     klinik = Kurum(
         ad="Merkez Veteriner Kliniği",
         tur=KurumTuru.KLINIK,
+        il="Konya",
+        ilce="Meram",
         adres="Meram, Konya",
         telefon="0332 222 30 30",
         email="klinik@patiportal.local",
@@ -340,6 +346,7 @@ def veritabanini_doldur(sifirla=False):
         tarih=bugun + timedelta(days=2),
         baslangic_saati=time(10, 0),
         bitis_saati=time(12, 0),
+        kapasite=2,
         aktif=True,
     )
     slot2 = TeslimSaati(
@@ -347,6 +354,7 @@ def veritabanini_doldur(sifirla=False):
         tarih=bugun + timedelta(days=3),
         baslangic_saati=time(14, 0),
         bitis_saati=time(16, 0),
+        kapasite=2,
         aktif=True,
     )
     slot3 = TeslimSaati(
@@ -354,6 +362,7 @@ def veritabanini_doldur(sifirla=False):
         tarih=bugun + timedelta(days=4),
         baslangic_saati=time(11, 0),
         bitis_saati=time(13, 0),
+        kapasite=2,
         aktif=True,
     )
     db.session.add_all([slot1, slot2, slot3])

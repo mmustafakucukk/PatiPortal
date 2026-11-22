@@ -43,8 +43,8 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 
 1. **Ziyaretçi (Oturumsuz):** Herkese açık sayfalar, hayvan/ihtiyaç/kurum listesi, kamu istatistikleri.
 2. **Kayıtlı Kullanıcı (`ziyaretci`):** Başvuru yapma, geçmiş başvurularını ve sahiplendiği hayvanları görme, teslim alma randevusu alma.
-3. **Barınak / Kurum Görevlisi (`gorevli`):** Sadece `Kurum Görevlileri` tablosunda yetkili olduğu kurumun hayvan, aşı, ihtiyaç, başvuru ve teslimat işlemlerini yönetir.
-4. **Sistem Yöneticisi (`admin`):** Tüm kurumları, görevli atamalarını ve kullanıcı hesaplarını yönetir.
+3. **Barınak / Kurum Görevlisi (`gorevli`):** Sadece `Kurum Görevlileri` tablosunda yetkili olduğu kurumun hayvan, aşı, ihtiyaç, başvuru ve teslimat işlemlerini yönetir. `gorev_tanimi: "yonetici"` olan görevliler kendi kurumlarının görevli listesini de yönetebilir.
+4. **Sistem Yöneticisi (`admin`):** Tüm kurumları, görevli atamalarını, işlem kayıtlarını ve kullanıcı hesaplarını yönetir.
 
 ---
 
@@ -52,10 +52,11 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Herkes | Kayıt olur (dakikada en fazla 10 istek). KVKK onayı zorunludur, şifre en az 8 karakterdir, rol varsayılan `ziyaretci` atanır. Aynı e-posta varsa `409`. |
+| `POST` | `/api/auth/register` | Herkes | Kayıt olur ve otomatik olarak oturum açar (dakikada en fazla 10 istek). KVKK onayı zorunludur, şifre en az 8 karakterdir, rol varsayılan `ziyaretci` atanır. Aynı e-posta varsa `409`. |
 | `POST` | `/api/auth/login` | Herkes | E-posta ve şifre ile oturum açar (dakikada en fazla 5 deneme). Hatalı bilgide `401`, pasif hesapta `403`, sınır aşımında `429`. |
 | `POST` | `/api/auth/logout` | Giriş yapmış | Aktif oturumu kapatır. |
-| `GET` | `/api/auth/me` | Giriş yapmış | Oturum açan kullanıcının profilini, rolünü ve yetkili olduğu kurum listesini döner (`auth.js` bunu kullanır). |
+| `GET` | `/api/auth/me` | Giriş yapmış | Oturum açan kullanıcının profilini, rolünü ve yetkili olduğu kurum listesini (`gorev_tanimi` dahil) döner (`auth.js` bunu kullanır). |
+| `PUT` | `/api/auth/password` | Giriş yapmış | Mevcut şifreyi doğrulayarak şifre değiştirir: `{"mevcut_sifre": "...", "yeni_sifre": "..."}`. Mevcut şifre yanlışsa `400`. |
 | `GET` | `/api/auth/csrf-token` | Herkes | `POST/PUT/PATCH/DELETE` isteklerinde `X-CSRFToken` başlığında gönderilecek `{"csrf_token": "..."}` değerini döner. |
 
 **`POST /api/auth/register` İstek Gövdesi:**
@@ -87,7 +88,7 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
   "rol": "gorevli",
   "aktif": true,
   "yetkili_kurumlar": [
-    { "id": 1, "ad": "Konya Merkez Barınağı" }
+    { "id": 1, "ad": "Konya Merkez Barınağı", "gorev_tanimi": "yonetici" }
   ],
   "olusturma_tarihi": "2026-11-20T14:50:00"
 }
@@ -102,19 +103,21 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/users` | Admin | Tüm kullanıcıları listeler. Filtreler: `rol` (`ziyaretci`/`gorevli`/`admin`), `aktif` (`true`/`false`), `arama` (ad soyad veya e-posta). |
 | `POST` | `/api/users` | Admin | Yeni görevli veya yönetici hesabı oluşturur (`ad_soyad`*, `email`*, `telefon`*, `sifre`*, `rol` [varsayılan `gorevli`]). Aynı e-posta `409`. |
+| `PUT` | `/api/users/me` | Giriş yapmış | Kendi profil bilgilerini (`ad_soyad`, `telefon`) kısmi olarak günceller. |
 | `PUT` | `/api/users/<id>` | Admin | Kısmi güncelleme (`ad_soyad`, `telefon`, `rol`, `aktif`). Admin kendi hesabını pasifleştiremez veya kendi `admin` rolünü kaldıramaz (`400`). Görevli rolünden çıkarılan kullanıcının kurum atamaları otomatik temizlenir. |
 | `DELETE` | `/api/users/me` | Giriş yapmış | KVKK kapsamında kullanıcının hesabını kapatır ve oturumu sonlandırır. Bağlı başvuru/randevu/sahiplendirme kaydı yoksa kalıcı siler; varsa kişisel verileri (`ad_soyad`, `email`, `telefon`, şifre) anonimleştirir. |
 
 ### Kurumlar ve Görevli Atama (`/api/institutions`)
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/institutions` | Herkes | Kurumları listeler. Filtreler: `tur` (`barinak`/`klinik`), `aktif` (`true`/`false`, sadece admin; diğer kullanıcılar yalnız aktif kurumları görür). |
-| `GET` | `/api/institutions/<id>` | Herkes | Kurum detayı (pasif kurumlar sadece admin tarafından görüntülenir, diğerlerine `404`). |
-| `POST` | `/api/institutions` | Admin | Yeni barınak/klinik ekler: `ad`*, `tur` (`barinak`/`klinik`, varsayılan `barinak`), `adres`, `telefon`, `email`. |
-| `PUT` | `/api/institutions/<id>` | Admin | Kısmi güncelleme (`ad`, `tur`, `adres`, `telefon`, `email`, `aktif`). |
-| `GET` | `/api/institutions/<id>/staff` | Admin | Kuruma atanmış görevlileri listeler (`id`, `kurum_id`, `user_id`, `ad_soyad`, `email`, `gorev_tanimi`, `baslangic_tarihi`). |
-| `POST` | `/api/institutions/<id>/staff` | Admin | Kuruma görevli atar: `{"user_id": 5, "gorev_tanimi": "gorevli"}` (`gorev_tanimi` opsiyonel, varsayılan `"gorevli"`). Yalnızca `gorevli` rolündeki kullanıcılar atanabilir (`400`); zaten atanmışsa `409`. |
-| `DELETE` | `/api/institutions/<id>/staff/<user_id>` | Admin | Görevlinin o kurumdaki yetkisini kaldırır (atanmamışsa `404`). |
+| `GET` | `/api/institutions` | Herkes | Kurumları listeler. Filtreler: `tur` (`barinak`/`klinik`), `il`, `ilce`, `aktif` (`true`/`false`, sadece admin; diğer kullanıcılar yalnız aktif kurumları görür). |
+| `GET` | `/api/institutions/<id>` | Herkes | Kurum detayı (`il`, `ilce`, `adres`, `telefon`, `email`, `aktif`). Pasif kurumlar sadece admin tarafından görüntülenir, diğerlerine `404`. |
+| `POST` | `/api/institutions` | Admin | Yeni barınak/klinik ekler: `ad`*, `tur` (`barinak`/`klinik`, varsayılan `barinak`), `il`, `ilce`, `adres`, `telefon`, `email`. |
+| `PUT` | `/api/institutions/<id>` | Admin | Kısmi güncelleme (`ad`, `tur`, `il`, `ilce`, `adres`, `telefon`, `email`, `aktif`). |
+| `DELETE` | `/api/institutions/<id>` | Admin | Kurumu siler. Bağlı hayvan, ihtiyaç veya teslim saati varsa silinemez (`409`); pasifleştirilmelidir. |
+| `GET` | `/api/institutions/<id>/staff` | Admin / Kurum Yöneticisi | Kuruma atanmış görevlileri listeler (`id`, `kurum_id`, `user_id`, `ad_soyad`, `email`, `gorev_tanimi`, `baslangic_tarihi`). |
+| `POST` | `/api/institutions/<id>/staff` | Admin / Kurum Yöneticisi | Kuruma görevli atar: `user_id` **veya** `email` ve opsiyonel `gorev_tanimi` (varsayılan `"gorevli"`). Ziyaretçi kullanıcı atanırsa rolü otomatik `gorevli` yapılır. Admin atanamaz (`400`), pasif kullanıcı veya mevcut atama `409`. `gorev_tanimi: "yonetici"` ataması yalnızca sistem yöneticisi tarafından yapılabilir (`403`). |
+| `DELETE` | `/api/institutions/<id>/staff/<user_id>` | Admin / Kurum Yöneticisi | Görevlinin o kurumdaki yetkisini kaldırır (atanmamışsa `404`). Kurum yöneticisi kendini veya başka bir kurum yöneticisini çıkaramaz (`400`/`403`). |
 
 ---
 
@@ -122,18 +125,19 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/applications` | Giriş yapmış | Sahiplenme başvurusu oluşturur: `animal_id`*, `ev_tipi`*, `aciklama`*, `kvkk_onay: true`*, `onceki_deneyim` (opsiyonel). |
-| `GET` | `/api/applications/me` | Giriş yapmış | Kullanıcının kendi başvurularını ve durumlarını listeler. |
-| `GET` | `/api/applications` | Görevli (kurum) | Yetkili olunan kurumlardaki başvuruları listeler. Filtreler: `durum` (`beklemede`/`onaylandi`/`reddedildi`), `animal_id`, `kurum_id`. Listede başvuranın telefonu dönmez. |
-| `GET` | `/api/applications/<id>` | Görevli (kurum) | Başvuru detayı (yetkili görevli/admin için `basvuran.telefon` dahildir). |
-| `PUT` | `/api/applications/<id>/onayla` | Görevli (kurum) | Beklemedeki başvuruyu onaylar (`beklemede` değilse `409`). |
-| `PUT` | `/api/applications/<id>/reddet` | Görevli (kurum) | Opsiyonel `{"degerlendirme_notu": "..."}` ile beklemedeki başvuruyu reddeder. Hayvan durumunu değiştirmez. |
+| `POST` | `/api/applications` | Giriş yapmış | Sahiplenme başvurusu oluşturur: `animal_id`*, `ev_tipi`*, `aciklama`*, `kvkk_onay: true`*, `onceki_deneyim` (opsiyonel, `null` kabul eder). |
+| `GET` | `/api/applications/me` | Giriş yapmış | Kullanıcının kendi başvurularını, durumlarını ve varsa bağlı teslim randevusu özetini (`randevu`) listeler. |
+| `GET` | `/api/applications` | Görevli (kurum) | Yetkili olunan kurumlardaki başvuruları listeler. Filtreler: `durum` (`beklemede`/`onaylandi`/`reddedildi`/`iptal`), `animal_id`, `kurum_id`. Listede başvuranın telefonu dönmez. |
+| `GET` | `/api/applications/<id>` | Görevli (kurum) | Başvuru detayı (yetkili görevli/admin için `basvuran.telefon` ve varsa `randevu` dahildir). |
+| `PUT` | `/api/applications/<id>/onayla` | Görevli (kurum) | Beklemedeki başvuruyu onaylar (`beklemede` değilse `409`). Hayvanı `rezerve` durumuna alır. |
+| `PUT` | `/api/applications/<id>/reddet` | Görevli (kurum) | Opsiyonel `{"degerlendirme_notu": "..."}` (`null` kabul eder) ile beklemedeki başvuruyu reddeder. Hayvan durumunu değiştirmez. |
+| `PUT` | `/api/applications/<id>/iptal` | Giriş yapmış | Kullanıcı kendi `beklemede` veya henüz teslim edilmemiş `onaylandi` başvurusunu iptal eder (`iptal`). Başkasının başvurusu `403`; teslim edilmiş veya zaten kapalıysa `409`. Onaylı başvuru iptal edilince varsa planlı randevu iptal edilir ve `rezerve` durumundaki hayvan tekrar `barinakta` olur. |
 
 **İş Kuralları:**
-- `sahiplendirildi` veya `tedavide` durumundaki hayvana başvuru yapılamaz (`409`).
-- Aynı kullanıcı aynı hayvana aynı anda sadece bir `beklemede` başvuru yapabilir (`409`); reddedilirse yeniden başvurabilir.
-- Başvuru onaylandığında hayvanın durumu `sahiplendirildi` yapılır ve aynı hayvana ait diğer `beklemede` başvurular `"Hayvan başka bir aileye sahiplendirildi"` notuyla otomatik reddedilir.
-- Her başvuru oluşturma, onaylama ve reddetme işlemi `İşlem Kayıtları` tablosuna loglanır.
+- `barinakta` dışındaki (`tedavide`, `rezerve`, `sahiplendirildi`) hayvana başvuru yapılamaz (`409`).
+- Aynı kullanıcı aynı hayvana aynı anda sadece bir `beklemede` başvuru yapabilir (`409`); reddedilirse veya iptal edilirse yeniden başvurabilir.
+- Başvuru onaylandığında hayvanın durumu `rezerve` yapılır (fiziksel teslimde `sahiplendirildi` olur) ve aynı hayvana ait diğer `beklemede` başvurular `"Hayvan başka bir aileye sahiplendirildi"` notuyla otomatik reddedilir.
+- Her başvuru oluşturma, onaylama, reddetme ve iptal işlemi `İşlem Kayıtları` tablosuna loglanır.
 
 **`GET /api/applications/<id>` Örnek Yanıt (`veri`):**
 ```json
@@ -144,15 +148,15 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
   "ev_tipi": "Bahçeli ev",
   "onceki_deneyim": "Daha önce 5 yıl kedi baktım.",
   "aciklama": "Sıcak ve güvenli bir yuva sunmak istiyorum.",
-  "durum": "beklemede",
+  "durum": "onaylandi",
   "degerlendirme_notu": null,
   "basvuru_tarihi": "2026-11-20T15:10:00",
-  "degerlendirme_tarihi": null,
+  "degerlendirme_tarihi": "2026-11-21T10:00:00",
   "hayvan": {
     "id": 7,
     "ad": "Pamuk",
     "tur": "Kedi",
-    "durum": "barinakta",
+    "durum": "rezerve",
     "kapak_fotografi": null,
     "kurum": { "id": 1, "ad": "Konya Merkez Barınağı", "tur": "barinak" }
   },
@@ -161,10 +165,20 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
     "ad_soyad": "Ayşe Yılmaz",
     "email": "ayse@ornek.com",
     "telefon": "05551234567"
+  },
+  "randevu": {
+    "id": 2,
+    "teslim_saati_id": 5,
+    "durum": "planlandi",
+    "not_metni": null,
+    "olusturma_tarihi": "2026-11-21T11:30:00",
+    "tarih": "2026-11-25",
+    "baslangic_saati": "10:00",
+    "bitis_saati": "10:30"
   }
 }
 ```
-*(Liste yanıtlarında `basvuran.telefon` alanı yer almaz.)*
+*(Liste yanıtlarında `basvuran.telefon` alanı yer almaz; randevusu yoksa `randevu: null` döner.)*
 
 ---
 
@@ -172,31 +186,50 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/institutions/<id>/pickup-slots` | Herkes | Kurumun bugün ve sonrası için aktif teslim alma tarih/saatlerini listeler. |
-| `POST` | `/api/institutions/<id>/pickup-slots` | Görevli (kurum) | Yeni teslim saati ekler: `{"tarih": "2026-11-25", "baslangic_saati": "10:00", "bitis_saati": "12:00"}`. Geçmiş tarih veya ters saat aralığı `400`. |
+| `GET` | `/api/institutions/<id>/pickup-slots` | Herkes | Kurumun bugün ve sonrası için aktif teslim alma tarih/saatlerini listeler (`kapasite`, `dolu_sayisi`, `kalan_kapasite`, `dolu` alanları dahil). |
+| `POST` | `/api/institutions/<id>/pickup-slots` | Görevli (kurum) | Yeni teslim saati ekler: `{"tarih": "2026-11-25", "baslangic_saati": "10:00", "bitis_saati": "12:00", "kapasite": 1}` (`kapasite`: 1–50, varsayılan 1). Geçmiş tarih veya ters saat aralığı `400`. |
+| `POST` | `/api/institutions/<id>/pickup-slots/bulk` | Görevli (kurum) | Toplu teslim saati ekler (en fazla 200 saat). Çakışan veya geçmiş saatler atlanır. Yanıt: `{"eklenenler": [...], "eklenen_sayisi": 12, "atlanan_sayisi": 2}`. |
 | `DELETE` | `/api/pickup-slots/<slot_id>` | Görevli (kurum) | Teslim saatini kaldırır. Aktif (`planlandi`) randevusu varsa `409`; geçmiş randevusu varsa pasifleştirilir (`aktif: false`), yoksa silinir. |
-| `POST` | `/api/appointments` | Giriş yapmış | Onaylı başvuru için teslim randevusu oluşturur: `{"application_id": 4, "slot_id": 2, "not_metni": "..."}` (`not_metni` opsiyonel). İptal edilmiş randevusu olan başvuru yeni saatle yeniden randevu alabilir. |
+| `POST` | `/api/appointments` | Giriş yapmış | Onaylı başvuru için teslim randevusu oluşturur: `{"application_id": 4, "slot_id": 2, "not_metni": "..."}` (`not_metni` opsiyonel, `null` kabul eder). Kapasitesi dolu saate `409`. `iptal` veya `gelmedi` randevusu olan başvuru yeni saatle yeniden randevu alabilir. |
 | `GET` | `/api/appointments/me` | Giriş yapmış | Kullanıcının kendi teslim alma randevularını listeler. |
-| `GET` | `/api/appointments` | Görevli (kurum) | Kuruma gelen randevuları listeler (`?durum=planlandi\|tamamlandi\|iptal`), `basvuran.telefon` dahil. |
+| `GET` | `/api/appointments` | Görevli (kurum) | Kuruma gelen randevuları listeler. Filtreler: `kurum_id` (başka kurum `403`), `tarih` (`YYYY-AA-GG`), `durum` (`planlandi`/`tamamlandi`/`iptal`/`gelmedi`). `basvuran.telefon` dahildir. |
 | `PUT` | `/api/appointments/<id>/iptal` | Giriş yapmış / Görevli (kurum) | Planlanmış (`planlandi`) randevuyu iptal eder (diğer durumlarda `409`). |
-| `POST` | `/api/adoptions/complete` | Görevli (kurum) | Teslimatı tamamlar: `{"application_id": 4, "teslim_notu": "..."}` (`teslim_notu` opsiyonel). `Sahiplendirme Kayıtları` kaydı oluşturur, varsa planlı randevuyu `tamamlandi` yapar, hayvan durumunu `sahiplendirildi` olarak doğrular ve loglar. |
-| `GET` | `/api/adoptions/me` | Giriş yapmış | Kullanıcının sahiplendiği hayvanları listeler (Kullanıcı sekmesi). |
+| `PUT` | `/api/appointments/<id>/gelmedi` | Görevli (kurum) | Planlanmış (`planlandi`) randevuyu `gelmedi` olarak işaretler (diğer durumlarda `409`). |
+| `POST` | `/api/adoptions/complete` | Görevli (kurum) | Teslimatı tamamlar: `{"application_id": 4, "teslim_notu": "..."}` (`teslim_notu` opsiyonel, `null` kabul eder). `Sahiplendirme Kayıtları` kaydı oluşturur, varsa planlı randevuyu `tamamlandi` yapar, hayvan durumunu `sahiplendirildi` yapar ve loglar. |
+| `GET` | `/api/adoptions` | Görevli (kurum) | Kurumun sahiplendirme kayıtlarını listeler (`?kurum_id=`, başka kurum `403`; `sahiplenen.telefon` dahildir). |
+| `GET` | `/api/adoptions/me` | Giriş yapmış | Kullanıcının sahiplendiği hayvanları ve her hayvanın `asi_karnesi` bilgisini listeler (Kullanıcı sekmesi). |
+
+**`POST /api/institutions/<id>/pickup-slots/bulk` İki Kabul Edilen İstek Biçimi:**
+```json
+{
+  "baslangic_tarihi": "2026-11-25",
+  "bitis_tarihi": "2026-12-01",
+  "gunler": [1, 2, 3, 4, 5],
+  "baslangic_saati": "10:00",
+  "bitis_saati": "16:00",
+  "sure": 30,
+  "kapasite": 2
+}
+```
+*(Alternatif: `{"saatler": [{"tarih": "2026-11-25", "baslangic_saati": "10:00", "bitis_saati": "10:30", "kapasite": 1}]}`. `gunler` değerleri: `0=Pazar, 1=Pazartesi ... 6=Cumartesi`.)*
 
 ---
 
-## 7. İstatistikler (`/api/stats`) — Bölüm 3
+## 7. İstatistikler ve İşlem Kayıtları — Bölüm 3
 
+### 7.1 İstatistikler (`/api/stats`)
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/stats/public` | Herkes | Anasayfa sayaçları: barınaktaki hayvan, sahiplendirilen hayvan ve aktif kurum sayısı. |
-| `GET` | `/api/stats` | Görevli | Panel özeti (görevli sadece kendi kurumlarını, admin tüm kurumları görür). |
+| `GET` | `/api/stats/public` | Herkes | Anasayfa sayaçları: barınaktaki hayvan, sahiplendirilen hayvan, aktif kurum ve açık ihtiyaç sayısı. |
+| `GET` | `/api/stats` | Görevli | Panel özeti (`?kurum_id=` ile tek kuruma daraltılabilir; görevli başka kurumu isterse `403`). |
 
 **`GET /api/stats/public` Örnek Yanıt (`veri`):**
 ```json
 {
   "barinaktaki_hayvan": 24,
   "sahiplendirilen_hayvan": 18,
-  "aktif_kurum": 3
+  "aktif_kurum": 3,
+  "acik_ihtiyac": 5
 }
 ```
 
@@ -206,13 +239,43 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
   "toplam_hayvan": 30,
   "barinaktaki_hayvan": 12,
   "tedavideki_hayvan": 3,
-  "sahiplendirilen_hayvan": 15,
+  "rezerve_hayvan": 2,
+  "sahiplendirilen_hayvan": 13,
   "bekleyen_basvuru": 4,
   "acik_ihtiyac": 2,
   "bu_hafta_asisi_gelen": 5,
   "geciken_asi": 1,
   "aylik_basvuru": 9,
   "aylik_sahiplendirme": 6
+}
+```
+
+### 7.2 İşlem Kayıtları (`/api/audit-logs`)
+| Metot | Endpoint | Yetki | Açıklama |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/audit-logs` | Admin | Sistemdeki işlem kayıtlarını en yeniden eskiye sayfalı olarak listeler. |
+
+**Filtreler:** `baslangic` (`YYYY-AA-GG`), `bitis` (`YYYY-AA-GG`), `kullanici_id`, `kurum_id`, `islem_turu`, `hedef_tablo`, `sayfa` (varsayılan 1), `limit` (1–100, varsayılan 20).
+
+**`GET /api/audit-logs` Örnek Yanıt (`veri`):**
+```json
+{
+  "kayitlar": [{
+    "id": 42,
+    "kullanici_id": 2,
+    "kullanici": {
+      "id": 2,
+      "ad_soyad": "Zeynep Kaya",
+      "email": "gorevli@patiportal.local",
+      "rol": "gorevli"
+    },
+    "islem_turu": "basvuru_onaylandi",
+    "hedef_tablo": "sahiplendirme_basvurulari",
+    "hedef_id": 4,
+    "detay": "Başvuru #4 onaylandı (Hayvan #7 - Pamuk)",
+    "tarih": "2026-11-22T10:15:00"
+  }],
+  "sayfalama": { "sayfa": 1, "limit": 20, "toplam": 42, "sayfa_sayisi": 3 }
 }
 ```
 
@@ -259,7 +322,7 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 ```
 Doğum tarihi bilinmeyen hayvanda `yas: null`, `yas_metni: "Bilinmiyor"`; fotoğrafı olmayan hayvanda `kapak_fotografi: null` döner.
 
-**Bölüm 3 için:** Başvuru onayında / teslimde hayvan durumu `app/services/hayvan_servisi.py → hayvan_durumunu_degistir(hayvan, "sahiplendirildi")` ile değiştirilir. Fonksiyon işlem kaydı yazar ama **commit etmez**; çağıran taraf kendi işlemiyle birlikte commit eder.
+**Bölüm 3 için:** Başvuru onayında / teslimde hayvan durumu `app/services/hayvan_servisi.py → hayvan_durumunu_degistir(hayvan, "rezerve" / "sahiplendirildi")` ile değiştirilir. Fonksiyon işlem kaydı yazar ama **commit etmez**; çağıran taraf kendi işlemiyle birlikte commit eder.
 
 ### 8.2 Fotoğraflar
 | Metot | Endpoint | Yetki | Açıklama |
