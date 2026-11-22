@@ -60,8 +60,17 @@ def create_app(ortam=None):
     from app.routes.applications import applications_bp
     from app.routes.adoptions import adoptions_bp
     from app.routes.stats import stats_bp
+    from app.routes.audit_logs import audit_logs_bp
 
-    for blueprint in (auth_bp, users_bp, institutions_bp, applications_bp, adoptions_bp, stats_bp):
+    for blueprint in (
+        auth_bp,
+        users_bp,
+        institutions_bp,
+        applications_bp,
+        adoptions_bp,
+        stats_bp,
+        audit_logs_bp,
+    ):
         app.register_blueprint(blueprint)
 
     # Bölüm 4 (Samet): hayvanlar, fotoğraflar, aşılar, ihtiyaçlar, hayvan türleri

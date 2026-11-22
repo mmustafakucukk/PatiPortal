@@ -1,7 +1,7 @@
 """
 Sabit değer listeleri (enum'lar).
 
-Veritabanında düz metin olarak saklanırlar ("barinakta", "kedi" gibi).
+Veritabanında düz metin olarak saklanılırlar ("barinakta", "kedi" gibi).
 Hem modeller hem de doğrulama şemaları buradan okur, böylece
 izin verilen değerler tek bir yerde tanımlı olur.
 """
@@ -34,6 +34,7 @@ class Cinsiyet(StrEnum):
 class HayvanDurumu(StrEnum):
     BARINAKTA = "barinakta"
     TEDAVIDE = "tedavide"
+    REZERVE = "rezerve"
     SAHIPLENDIRILDI = "sahiplendirildi"
 
 
@@ -82,12 +83,14 @@ class BasvuruDurumu(StrEnum):
     BEKLEMEDE = "beklemede"
     ONAYLANDI = "onaylandi"
     REDDEDILDI = "reddedildi"
+    IPTAL = "iptal"
 
 
 class RandevuDurumu(StrEnum):
     PLANLANDI = "planlandi"
     TAMAMLANDI = "tamamlandi"
     IPTAL = "iptal"
+    GELMEDI = "gelmedi"
 
 
 class Islem(StrEnum):
@@ -119,15 +122,20 @@ class Islem(StrEnum):
     KULLANICI_OLUSTURULDU = "kullanici_olusturuldu"
     KULLANICI_GUNCELLENDI = "kullanici_guncellendi"
     KULLANICI_SILINDI = "kullanici_silindi"
+    PROFIL_GUNCELLENDI = "profil_guncellendi"
+    SIFRE_DEGISTIRILDI = "sifre_degistirildi"
     KURUM_EKLENDI = "kurum_eklendi"
     KURUM_GUNCELLENDI = "kurum_guncellendi"
+    KURUM_SILINDI = "kurum_silindi"
     GOREVLI_ATANDI = "gorevli_atandi"
     GOREVLI_CIKARILDI = "gorevli_cikarildi"
     BASVURU_OLUSTURULDU = "basvuru_olusturuldu"
     BASVURU_ONAYLANDI = "basvuru_onaylandi"
     BASVURU_REDDEDILDI = "basvuru_reddedildi"
+    BASVURU_IPTAL_EDILDI = "basvuru_iptal_edildi"
     TESLIM_SAATI_EKLENDI = "teslim_saati_eklendi"
     TESLIM_SAATI_SILINDI = "teslim_saati_silindi"
     RANDEVU_OLUSTURULDU = "randevu_olusturuldu"
     RANDEVU_IPTAL_EDILDI = "randevu_iptal_edildi"
+    RANDEVU_GELMEDI = "randevu_gelmedi"
     SAHIPLENDIRME_TAMAMLANDI = "sahiplendirme_tamamlandi"

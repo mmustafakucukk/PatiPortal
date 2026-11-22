@@ -1,10 +1,11 @@
 """
 Kimlik doğrulama – Bölüm 3 (API.md bölüm 3)
 
-POST /api/auth/register     Herkes        Kayıt (KVKK zorunlu, rol=ziyaretci)
+POST /api/auth/register     Herkes        Kayıt (KVKK zorunlu, rol=ziyaretci, otomatik giriş)
 POST /api/auth/login        Herkes        Giriş (dakikada en fazla 5 deneme)
 POST /api/auth/logout       Giriş yapmış  Çıkış
 GET  /api/auth/me           Giriş yapmış  Aktif kullanıcı profili, rolü ve yetkili kurumları
+PUT  /api/auth/password     Giriş yapmış  Mevcut şifreyi doğrulayarak şifre değiştirir
 GET  /api/auth/csrf-token   Herkes        Frontend fetch istekleri için X-CSRFToken değeri
 """
 
@@ -13,7 +14,7 @@ from flask_login import current_user
 from flask_wtf.csrf import generate_csrf
 
 from app.extensions import limiter
-from app.schemas.auth import GirisSemasi, KayitSemasi
+from app.schemas.auth import GirisSemasi, KayitSemasi, SifreDegistirSemasi
 from app.schemas.ortak import dogrula
 from app.services import auth_servisi
 from app.utils.decorators import giris_gerekli
@@ -49,6 +50,14 @@ def cikis_yap():
 @giris_gerekli
 def profilim():
     return basarili_yanit(current_user.to_dict(iletisim=True))
+
+
+@auth_bp.put("/password")
+@giris_gerekli
+def sifre_degistir():
+    veri = dogrula(SifreDegistirSemasi, request.get_json(silent=True))
+    auth_servisi.sifre_degistir(veri)
+    return basarili_yanit({"mesaj": "Şifreniz güncellendi."})
 
 
 @auth_bp.get("/csrf-token")

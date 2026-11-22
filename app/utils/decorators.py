@@ -70,6 +70,21 @@ def kurum_yetkisi_var_mi(kullanici, kurum_id):
     return kurum_id in yetkili_kurumlar
 
 
+def kurum_yoneticisi_mi(kullanici, kurum_id):
+    """
+    Kurum personeli yönetimi için yetki kontrolü:
+    - Admin her kurumda yetkilidir.
+    - Görevli sadece 'yonetici' tanımıyla atandığı kurum(lar)da yetkilidir.
+    """
+    if getattr(kullanici, "rol", None) == ROL_ADMIN:
+        return True
+    if getattr(kullanici, "rol", None) != ROL_GOREVLI:
+        return False
+
+    yonetici_kurumlar = getattr(kullanici, "yonetici_kurum_idleri", [])
+    return kurum_id in yonetici_kurumlar
+
+
 def kurum_yetkili_gerekli(parametre_adi="kurum_id"):
     """URL parametresindeki kurum_id için görevlinin o kuruma yetkili olduğunu doğrular."""
     def dekorator(f):

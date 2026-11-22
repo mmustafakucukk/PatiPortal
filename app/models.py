@@ -106,6 +106,15 @@ class Kullanici(UserMixin, db.Model):
         """app/utils/decorators.py → kurum_yetkisi_var_mi() bunu kullanır."""
         return [gorev.kurum_id for gorev in self.kurum_gorevleri]
 
+    @property
+    def yonetici_kurum_idleri(self):
+        """Görevlinin 'yonetici' tanımıyla yetkili olduğu kurum ID'leri."""
+        return [
+            gorev.kurum_id
+            for gorev in self.kurum_gorevleri
+            if gorev.gorev_tanimi == "yonetici"
+        ]
+
     def sifre_belirle(self, sifre):
         self.sifre_hash = generate_password_hash(sifre)
 
@@ -121,7 +130,8 @@ class Kullanici(UserMixin, db.Model):
             "rol": self.rol,
             "aktif": self.aktif,
             "yetkili_kurumlar": [
-                {"id": g.kurum.id, "ad": g.kurum.ad} for g in self.kurum_gorevleri
+                {"id": g.kurum.id, "ad": g.kurum.ad, "gorev_tanimi": g.gorev_tanimi}
+                for g in self.kurum_gorevleri
             ],
             "olusturma_tarihi": _iso(self.olusturma_tarihi),
         }
@@ -137,6 +147,8 @@ class Kurum(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ad = db.Column(db.String(150), nullable=False)
     tur = db.Column(enum_tipi(KurumTuru), nullable=False, default=KurumTuru.BARINAK)
+    il = db.Column(db.String(50))
+    ilce = db.Column(db.String(50))
     adres = db.Column(db.String(500))
     telefon = db.Column(db.String(20))  # kurumun telefonu kişisel veri değildir, şifrelenmez
     email = db.Column(db.String(120))
@@ -153,6 +165,8 @@ class Kurum(db.Model):
     def to_dict(self):
         return {
             **self.ozet(),
+            "il": self.il,
+            "ilce": self.ilce,
             "adres": self.adres,
             "telefon": self.telefon,
             "email": self.email,
@@ -530,6 +544,7 @@ class SahiplendirmeBasvurusu(db.Model):
 
     hayvan = db.relationship("Hayvan")
     kullanici = db.relationship("Kullanici", foreign_keys=[kullanici_id])
+    randevu = db.relationship("TeslimRandevusu", back_populates="basvuru", uselist=False)
 
 
 # ---------------------------------------------------------------- 13. Teslim alma saatleri
@@ -542,6 +557,7 @@ class TeslimSaati(db.Model):
     tarih = db.Column(db.Date, nullable=False)
     baslangic_saati = db.Column(db.Time, nullable=False)
     bitis_saati = db.Column(db.Time, nullable=False)
+    kapasite = db.Column(db.Integer, nullable=False, default=1, server_default="1")
     aktif = db.Column(db.Boolean, nullable=False, default=True)
 
     kurum = db.relationship("Kurum")
@@ -561,7 +577,7 @@ class TeslimRandevusu(db.Model):
     not_metni = db.Column(db.Text)
     olusturma_tarihi = db.Column(db.DateTime, nullable=False, default=simdi)
 
-    basvuru = db.relationship("SahiplendirmeBasvurusu")
+    basvuru = db.relationship("SahiplendirmeBasvurusu", back_populates="randevu")
     teslim_saati = db.relationship("TeslimSaati")
 
 
@@ -600,10 +616,22 @@ class IslemKaydi(db.Model):
     ip_adresi = db.Column(db.String(45))
     tarih = db.Column(db.DateTime, nullable=False, default=simdi, index=True)
 
+    kullanici = db.relationship("Kullanici")
+
     def to_dict(self):
         return {
             "id": self.id,
             "kullanici_id": self.kullanici_id,
+            "kullanici": (
+                {
+                    "id": self.kullanici.id,
+                    "ad_soyad": self.kullanici.ad_soyad,
+                    "email": self.kullanici.email,
+                    "rol": self.kullanici.rol,
+                }
+                if self.kullanici
+                else None
+            ),
             "islem_turu": self.islem_turu,
             "hedef_tablo": self.hedef_tablo,
             "hedef_id": self.hedef_id,

@@ -4,6 +4,7 @@ Kullanıcı yönetimi – Bölüm 3 (API.md bölüm 4)
 GET    /api/users       Admin         Kullanıcıları listeler (?rol, ?aktif, ?arama)
 POST   /api/users       Admin         Yeni görevli / yönetici oluşturur
 PUT    /api/users/<id>  Admin         Rol değiştirir, bilgi günceller veya pasifleştirir
+PUT    /api/users/me    Giriş yapmış  Kendi profil bilgilerini (ad_soyad, telefon) günceller
 DELETE /api/users/me    Giriş yapmış  KVKK kapsamında kendi hesabını siler
 """
 
@@ -14,6 +15,7 @@ from app.schemas.user import (
     KullaniciFiltreSemasi,
     KullaniciGuncelleSemasi,
     KullaniciOlusturSemasi,
+    ProfilGuncelleSemasi,
 )
 from app.services import kullanici_servisi
 from app.utils.decorators import admin_gerekli, giris_gerekli
@@ -36,6 +38,16 @@ def kullanici_ekle():
     veri = dogrula(KullaniciOlusturSemasi, request.get_json(silent=True))
     kullanici = kullanici_servisi.kullanici_olustur(veri)
     return basarili_yanit(kullanici.to_dict(iletisim=True), 201)
+
+
+@users_bp.put("/me")
+@giris_gerekli
+def profilimi_guncelle():
+    degisiklikler = dogrula(
+        ProfilGuncelleSemasi, request.get_json(silent=True), kismi=True
+    )
+    kullanici = kullanici_servisi.profil_guncelle(degisiklikler)
+    return basarili_yanit(kullanici.to_dict(iletisim=True))
 
 
 @users_bp.put("/<int:kullanici_id>")

@@ -86,6 +86,31 @@ def kullanici_olustur(veri):
     return bul_veya_404(Kullanici, kullanici.id, secenekler=list(YUKLEME))
 
 
+def profil_guncelle(degisiklikler):
+    kullanici = bul_veya_404(
+        Kullanici, current_user.id, "Kullanıcı bulunamadı.", secenekler=list(YUKLEME)
+    )
+
+    degisenler = []
+    if "ad_soyad" in degisiklikler and degisiklikler["ad_soyad"] is not None:
+        kullanici.ad_soyad = degisiklikler["ad_soyad"]
+        degisenler.append("ad_soyad")
+
+    if "telefon" in degisiklikler and degisiklikler["telefon"] is not None:
+        kullanici.telefon = _telefon_temizle(degisiklikler["telefon"])
+        degisenler.append("telefon")
+
+    if degisenler:
+        logla(
+            Islem.PROFIL_GUNCELLENDI,
+            kullanici,
+            f"{kullanici.email}: {', '.join(degisenler)}",
+        )
+        db.session.commit()
+
+    return kullanici
+
+
 def kullanici_guncelle(kullanici_id, degisiklikler):
     kullanici = bul_veya_404(
         Kullanici, kullanici_id, "Kullanıcı bulunamadı.", secenekler=list(YUKLEME)

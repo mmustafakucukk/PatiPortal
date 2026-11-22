@@ -134,10 +134,10 @@ def test_admin_kurum_ekler_ve_gunceller(gorevli_istemci, admin_istemci):
 
 
 def test_kurum_gorevli_atama_listeleme_ve_cikarma(app, admin_istemci, veri):
-    # Ziyaretçi rolündeki kullanıcı kuruma atanamaz
+    # Admin rolündeki kullanıcı kuruma görevli olarak atanamaz
     hatali = admin_istemci.post(
         f"/api/institutions/{veri.kurum_id}/staff",
-        json={"user_id": veri.kullanici_id},
+        json={"user_id": veri.admin_id},
     )
     assert hatali.status_code == 400
 

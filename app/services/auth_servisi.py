@@ -4,13 +4,13 @@ Kimlik doğrulama iş kuralları – Bölüm 3 (API.md bölüm 3).
 
 import re
 
-from flask_login import login_user, logout_user
+from flask_login import current_user, login_user, logout_user
 from sqlalchemy.orm import joinedload, selectinload
 
 from app.extensions import db
 from app.models import Kullanici, KurumGorevlisi, simdi
 from app.sabitler import Islem, Rol
-from app.services.ortak import logla
+from app.services.ortak import bul_veya_404, logla
 from app.utils.hatalar import ApiHatasi
 
 KULLANICI_YUKLEME = (
@@ -54,6 +54,9 @@ def kullanici_kayit(veri):
     db.session.flush()
     logla(Islem.KULLANICI_KAYIT_OLDU, kullanici, f"{kullanici.email} kayıt oldu")
     db.session.commit()
+
+    # Kayıt olan kullanıcı otomatik olarak oturum açar
+    login_user(kullanici)
     return kullanici
 
 
@@ -74,6 +77,17 @@ def kullanici_giris(veri):
     logla(Islem.KULLANICI_GIRIS_YAPTI, kullanici, f"{kullanici.email} giriş yaptı")
     db.session.commit()
     return kullanici
+
+
+def sifre_degistir(veri):
+    kullanici = bul_veya_404(Kullanici, current_user.id, "Kullanıcı bulunamadı.")
+
+    if not kullanici.sifre_dogru_mu(veri["mevcut_sifre"]):
+        raise ApiHatasi.alan("mevcut_sifre", "Mevcut şifreniz hatalı.")
+
+    kullanici.sifre_belirle(veri["yeni_sifre"])
+    logla(Islem.SIFRE_DEGISTIRILDI, kullanici, f"{kullanici.email} şifresini değiştirdi")
+    db.session.commit()
 
 
 def kullanici_cikis():
