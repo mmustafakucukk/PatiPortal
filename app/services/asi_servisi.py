@@ -26,6 +26,7 @@ from app.sabitler import AsiDurumu, HayvanDurumu, Islem
 from app.services import dosyalar
 from app.services.kurum_yetkisi import kurum_filtresi, kurum_yetkisi_kontrol
 from app.services.ortak import bul_veya_404, logla
+from app.services.tur_servisi import tekrar_araligi
 from app.utils.hatalar import ApiHatasi
 
 
@@ -137,8 +138,11 @@ def asi_karnesi(hayvan):
 
 
 # ------------------------------------------------------------------ Panel listeleri
-def _panel_asi_sorgusu():
-    """Sahiplendirilmemiş hayvanların açık dozları (görevli sadece kendi kurumlarını görür)."""
+def _panel_asi_sorgusu(kurum_id=None):
+    """
+    Sahiplendirilmemiş hayvanların açık dozları. Görevli sadece kendi kurumlarını görür;
+    kurum_id verilirse tek kuruma daraltılır (görevli başka kurumu isterse 403).
+    """
     sorgu = (
         db.select(HayvanAsisi)
         .join(HayvanAsisi.hayvan)
@@ -146,11 +150,15 @@ def _panel_asi_sorgusu():
         .options(
             contains_eager(HayvanAsisi.hayvan).selectinload(Hayvan.fotograflar),
             contains_eager(HayvanAsisi.hayvan).joinedload(Hayvan.tur),
+            contains_eager(HayvanAsisi.hayvan).joinedload(Hayvan.kurum),
             joinedload(HayvanAsisi.asi_turu),
             joinedload(HayvanAsisi.uygulayan_kurum),
         )
         .order_by(HayvanAsisi.sonraki_tarih, Hayvan.ad)
     )
+    if kurum_id is not None:
+        kurum_yetkisi_kontrol(kurum_id)
+        sorgu = sorgu.where(Hayvan.kurum_id == kurum_id)
     kosul = kurum_filtresi(Hayvan.kurum_id)
     return sorgu if kosul is None else sorgu.where(kosul)
 
@@ -162,16 +170,16 @@ def _panel_listesi(sorgu):
     ]
 
 
-def yaklasan_asilar(gun):
+def yaklasan_asilar(gun, kurum_id=None):
     bugun = date.today()
-    sorgu = _panel_asi_sorgusu().where(
+    sorgu = _panel_asi_sorgusu(kurum_id).where(
         HayvanAsisi.sonraki_tarih.between(bugun, bugun + timedelta(days=gun))
     )
     return _panel_listesi(sorgu)
 
 
-def gecikmis_asilar():
-    sorgu = _panel_asi_sorgusu().where(HayvanAsisi.sonraki_tarih < date.today())
+def gecikmis_asilar(kurum_id=None):
+    sorgu = _panel_asi_sorgusu(kurum_id).where(HayvanAsisi.sonraki_tarih < date.today())
     return _panel_listesi(sorgu)
 
 
@@ -189,8 +197,18 @@ def _tarihleri_kontrol(asi):
 
 
 def asi_ekle(hayvan, veri):
+    """
+    Sonraki doz tarihi boş gönderilirse ve bu türde aşının tekrar aralığı tanımlıysa
+    (Aşı Gereklilikleri), sonraki doz uygulama tarihi + aralık olarak otomatik yazılır.
+    """
     kurum_yetkisi_kontrol(hayvan.kurum_id)
     _iliskileri_kontrol(veri["asi_turu_id"], veri.get("uygulayan_kurum_id"))
+
+    veri = dict(veri)
+    if veri.get("sonraki_tarih") is None:
+        aralik = tekrar_araligi(hayvan.tur_id, veri["asi_turu_id"])
+        if aralik:
+            veri["sonraki_tarih"] = veri["uygulama_tarihi"] + timedelta(days=aralik)
 
     asi = HayvanAsisi(hayvan=hayvan, giren_id=current_user.id, **veri)
     _tarihleri_kontrol(asi)

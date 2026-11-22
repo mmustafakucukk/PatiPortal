@@ -2,7 +2,7 @@
 
 from marshmallow import ValidationError, fields, validate, validates_schema
 
-from app.sabitler import Cinsiyet, HayvanDurumu
+from app.sabitler import Cinsiyet, HayvanDurumu, HayvanSiralama
 from app.schemas.ortak import Sema, ZORUNLU, mantiksal, metin, secim, tam_sayi, tarih
 
 
@@ -16,7 +16,9 @@ class HayvanFiltreSemasi(Sema):
     kisir = mantiksal()
     durum = secim(HayvanDurumu)  # sadece görevli için geçerli
     kurum_id = tam_sayi(en_az=1)
+    il = metin(50)  # kurum adresinde aranır (kurumda ayrı il alanı yok)
     arama = metin(50)
+    siralama = secim(HayvanSiralama, varsayilan=HayvanSiralama.YENI)
     sayfa = tam_sayi(en_az=1, varsayilan=1)
     limit = tam_sayi(en_az=1, en_fazla=50, varsayilan=12)
 
@@ -58,11 +60,30 @@ class HayvanTuruSemasi(Sema):
     ad = metin(30, zorunlu=True)
 
 
+_EN_FAZLA_30 = validate.Length(max=30, error="En fazla 30 aşı seçilebilir.")
+_LISTE_MESAJLARI = {"required": ZORUNLU, "null": ZORUNLU, "invalid": "Liste olmalıdır."}
+
+
+class ZorunluAsiSemasi(Sema):
+    asi_turu_id = tam_sayi(zorunlu=True, en_az=1)
+    tekrar_araligi_gun = tam_sayi(en_az=1, en_fazla=3650)
+
+
 class ZorunluAsilarSemasi(Sema):
+    """
+    PUT /api/hayvan-turleri/<id>/zorunlu-asilar – iki biçimden biri gönderilir:
+      {"asi_turu_idleri": [1, 2]}                                → sadece liste (aralıklar korunur)
+      {"asilar": [{"asi_turu_id": 1, "tekrar_araligi_gun": 365}]} → aralıklarla birlikte
+    """
     asi_turu_idleri = fields.List(
         fields.Integer(strict=True, validate=validate.Range(min=1, error="Geçerli bir aşı türü ID giriniz."),
                        error_messages={"invalid": "Tam sayı olmalıdır."}),
-        required=True,
-        validate=validate.Length(max=30, error="En fazla 30 aşı seçilebilir."),
-        error_messages={"required": ZORUNLU, "null": ZORUNLU, "invalid": "Liste olmalıdır."},
+        validate=_EN_FAZLA_30,
+        error_messages=_LISTE_MESAJLARI,
     )
+    asilar = fields.List(fields.Nested(ZorunluAsiSemasi), validate=_EN_FAZLA_30, error_messages=_LISTE_MESAJLARI)
+
+    @validates_schema
+    def _bir_bicim_secilmeli(self, veri, **kwargs):
+        if ("asi_turu_idleri" in veri) == ("asilar" in veri):
+            raise ValidationError("asi_turu_idleri veya asilar alanlarından birini gönderin.", "asilar")

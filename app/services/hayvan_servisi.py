@@ -6,12 +6,12 @@ import calendar
 from datetime import date
 
 from flask_login import current_user
-from sqlalchemy import exists, not_, or_
+from sqlalchemy import exists, func, not_, or_
 from sqlalchemy.orm import joinedload, selectinload
 
 from app.extensions import db
-from app.models import Hayvan, HayvanTuru, SahiplendirmeBasvurusu, SahiplendirmeKaydi
-from app.sabitler import HayvanDurumu, Islem
+from app.models import Hayvan, HayvanTuru, Kurum, SahiplendirmeBasvurusu, SahiplendirmeKaydi
+from app.sabitler import HayvanDurumu, HayvanSiralama, Islem
 from app.services import dosyalar
 from app.services.asi_servisi import asilari_tam_haritasi, asilari_tam_ifadesi
 from app.services.kurum_yetkisi import kayit_icin_kurum_sec, kurum_yetkisi_kontrol
@@ -24,6 +24,15 @@ YUKLEME_SECENEKLERI = (
     joinedload(Hayvan.kurum),
     selectinload(Hayvan.fotograflar),
 )
+
+# Doğum tarihi bilinmeyenler yaş sıralamasında sona konur (is_(None): False < True).
+SIRALAMALAR = {
+    HayvanSiralama.YENI: (Hayvan.olusturma_tarihi.desc(), Hayvan.id.desc()),
+    HayvanSiralama.ESKI: (Hayvan.olusturma_tarihi.asc(), Hayvan.id.asc()),
+    HayvanSiralama.AD: (func.lower(Hayvan.ad), Hayvan.id),
+    HayvanSiralama.GENC: (Hayvan.dogum_tarihi.is_(None), Hayvan.dogum_tarihi.desc(), Hayvan.id.desc()),
+    HayvanSiralama.YASLI: (Hayvan.dogum_tarihi.is_(None), Hayvan.dogum_tarihi.asc(), Hayvan.id.asc()),
+}
 
 
 # ------------------------------------------------------------------ Tarih yardımcıları
@@ -64,6 +73,9 @@ def hayvan_listesi(filtre, gorevli):
         sorgu = sorgu.where(Hayvan.cinsiyet == filtre["cinsiyet"])
     if filtre.get("kurum_id"):
         sorgu = sorgu.where(Hayvan.kurum_id == filtre["kurum_id"])
+    if filtre.get("il"):
+        # Kurumda ayrı il alanı yok; il/ilçe adresin içinde yazılı (bkz. yönetim > kurumlar formu).
+        sorgu = sorgu.where(Hayvan.kurum.has(Kurum.adres.ilike(f"%{filtre['il']}%")))
     if filtre.get("kisir") is not None:
         sorgu = sorgu.where(Hayvan.kisirlastirildi == filtre["kisir"])
     if filtre.get("arama"):
@@ -81,7 +93,7 @@ def hayvan_listesi(filtre, gorevli):
         tam = asilari_tam_ifadesi()
         sorgu = sorgu.where(tam if filtre["asilar_tam"] else not_(tam))
 
-    sorgu = sorgu.order_by(Hayvan.olusturma_tarihi.desc(), Hayvan.id.desc())
+    sorgu = sorgu.order_by(*SIRALAMALAR[filtre["siralama"]])
     hayvanlar, sayfalama = sayfala(sorgu, filtre["sayfa"], filtre["limit"], YUKLEME_SECENEKLERI)
     return {"kayitlar": hayvanlari_sozluge_cevir(hayvanlar), "sayfalama": sayfalama}
 

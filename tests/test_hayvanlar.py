@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from app.extensions import db
-from app.models import Hayvan, HayvanFotografi, IslemKaydi, SahiplendirmeBasvurusu
+from app.models import Hayvan, HayvanFotografi, IslemKaydi, Kurum, SahiplendirmeBasvurusu
 from app.sabitler import Cinsiyet, HayvanDurumu, Islem
 from tests.yardimcilar import resim_dosyasi
 
@@ -216,3 +216,41 @@ def test_hayvan_durumunu_degistir_bolum3_icin(app, hayvan_ekle):
         assert hayvan_durumunu_degistir(hayvan, HayvanDurumu.SAHIPLENDIRILDI) is False  # zaten öyle
         db.session.rollback()  # commit etmediği için geri alınabilir
         assert db.session.get(Hayvan, hayvan_id).durum == HayvanDurumu.BARINAKTA
+
+
+# ------------------------------------------------------------------ Sıralama ve il filtresi
+def _sirali_adlar(istemci, siralama):
+    yanit = istemci.get(f"/api/animals?limit=50&siralama={siralama}")
+    assert yanit.status_code == 200, yanit.json
+    return [h["ad"] for h in yanit.json["veri"]["kayitlar"]]
+
+
+def test_siralama(ziyaretci, hayvan_ekle):
+    bugun = date.today()
+    hayvan_ekle(ad="Zeytin", dogum_tarihi=bugun - timedelta(days=60))     # ilk eklenen, en genç
+    hayvan_ekle(ad="boncuk", dogum_tarihi=bugun - timedelta(days=2000))   # en yaşlı
+    hayvan_ekle(ad="Arap")                                                 # yaşı bilinmiyor, son eklenen
+
+    assert _sirali_adlar(ziyaretci, "yeni") == ["Arap", "boncuk", "Zeytin"]
+    assert _sirali_adlar(ziyaretci, "eski") == ["Zeytin", "boncuk", "Arap"]
+    assert _sirali_adlar(ziyaretci, "ad") == ["Arap", "boncuk", "Zeytin"]  # büyük/küçük harf fark etmez
+    assert _sirali_adlar(ziyaretci, "genc") == ["Zeytin", "boncuk", "Arap"]   # bilinmeyen yaş sonda
+    assert _sirali_adlar(ziyaretci, "yasli") == ["boncuk", "Zeytin", "Arap"]
+    varsayilan = [h["ad"] for h in ziyaretci.get("/api/animals").json["veri"]["kayitlar"]]
+    assert varsayilan == ["Arap", "boncuk", "Zeytin"]  # siralama verilmezse "yeni"
+
+    yanit = ziyaretci.get("/api/animals?siralama=fiyat")
+    assert yanit.status_code == 400 and "siralama" in yanit.json["alanlar"]
+
+
+def test_il_filtresi_kurum_adresinde_arar(app, ziyaretci, hayvan_ekle, veri):
+    with app.app_context():
+        db.session.get(Kurum, veri.kurum_id).adres = "Yaka Mah. Meram / Konya"
+        db.session.get(Kurum, veri.diger_kurum_id).adres = "Moda, Kadıköy / Istanbul"
+        db.session.commit()
+    hayvan_ekle(ad="Konyali")
+    hayvan_ekle(ad="Istanbullu", kurum_id=veri.diger_kurum_id)
+
+    assert _adlar(ziyaretci, "il=konya") == ["Konyali"]
+    assert _adlar(ziyaretci, "il=Kadıköy") == ["Istanbullu"]
+    assert _adlar(ziyaretci, "il=Ankara") == []

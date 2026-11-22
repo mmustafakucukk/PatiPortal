@@ -194,7 +194,10 @@ class HayvanTuru(db.Model):
     def to_dict(self):
         return {
             **self.ozet(),
-            "zorunlu_asilar": [g.asi_turu.ozet() for g in self.asi_gereklilikleri],
+            "zorunlu_asilar": [
+                {**g.asi_turu.ozet(), "tekrar_araligi_gun": g.tekrar_araligi_gun}
+                for g in self.asi_gereklilikleri
+            ],
         }
 
 
@@ -266,6 +269,7 @@ class Hayvan(db.Model):
             "ad": self.ad,
             "tur": self.tur.ad if self.tur else None,
             "durum": self.durum,
+            "kurum": self.kurum.ozet() if self.kurum else None,
             "kapak_fotografi": kapak.to_dict() if kapak else None,
         }
 
@@ -358,6 +362,8 @@ class AsiGerekliligi(db.Model):
     asi_turu_id = db.Column(
         db.Integer, db.ForeignKey("asi_turleri.id", ondelete="CASCADE"), nullable=False
     )
+    # Bu türde aşının kaç günde bir tekrarlanacağı (ör. kuduz 365). Boşsa sonraki doz önerilmez.
+    tekrar_araligi_gun = db.Column(db.Integer)
 
     hayvan_turu = db.relationship("HayvanTuru", back_populates="asi_gereklilikleri")
     asi_turu = db.relationship("AsiTuru")
@@ -424,7 +430,13 @@ class AcilIhtiyac(db.Model):
     destek_talepleri = db.relationship("DestekTalebi", back_populates="ihtiyac")
 
     def ozet(self):
-        return {"id": self.id, "baslik": self.baslik, "durum": self.durum, "kurum": self.kurum.ozet()}
+        return {
+            "id": self.id,
+            "baslik": self.baslik,
+            "birim": self.birim,
+            "durum": self.durum,
+            "kurum": self.kurum.ozet(),
+        }
 
     def to_dict(self, toplam_soz=0.0):
         """`toplam_soz` (iptal edilmemiş destek sözlerinin toplamı) toplu sorguyla hesaplanıp verilir."""

@@ -236,7 +236,9 @@ Tüm backend endpoint'leri JSON döndürür; frontend bu API'yi `fetch` ile tük
 | `PATCH` | `/api/animals/<id>/durum` | Görevli (kurum) | `{"durum": "tedavide"}` |
 | `DELETE` | `/api/animals/<id>` | Görevli (kurum) | Siler; fotoğraf dosyaları ve aşı kayıtları da silinir. Başvurusu veya sahiplendirme kaydı olan hayvan silinemez (`409`). |
 
-**Liste filtreleri:** `tur_id`, `cinsiyet` (`erkek`/`disi`/`bilinmiyor`), `yas_min`, `yas_max` (yıl; doğum tarihi bilinmeyenler yaş filtresine girmez), `asilar_tam` (`true`/`false`), `kisir` (`true`/`false`), `kurum_id`, `arama` (ad veya cins), `durum` (sadece görevli), `sayfa` (varsayılan 1), `limit` (en fazla 50, varsayılan 12).
+**Liste filtreleri:** `tur_id`, `cinsiyet` (`erkek`/`disi`/`bilinmiyor`), `yas_min`, `yas_max` (yıl; doğum tarihi bilinmeyenler yaş filtresine girmez), `asilar_tam` (`true`/`false`), `kisir` (`true`/`false`), `kurum_id`, `il` (kurum adresinde aranır; kurumda ayrı il alanı yok), `arama` (ad veya cins), `durum` (sadece görevli), `siralama`, `sayfa` (varsayılan 1), `limit` (en fazla 50, varsayılan 12).
+
+**Sıralama (`siralama`):** `yeni` (varsayılan, en son eklenen önce) · `eski` (en uzun süredir bekleyen önce) · `ad` (A→Z) · `genc` (en genç önce) · `yasli` (en yaşlı önce). Yaş sıralamalarında doğum tarihi bilinmeyenler sonda yer alır. Geçersiz değer `400` döner.
 
 **Ekleme alanları:** `ad`*, `tur_id`*, `cinsiyet`*, `kurum_id`, `cins`, `dogum_tarihi` (YYYY-AA-GG, gelecekte olamaz) **veya** `yaklasik_yas_ay`, `kisirlastirildi`, `saglik_durumu`, `karakter_notu`, `durum` (varsayılan `barinakta`).
 
@@ -286,10 +288,12 @@ for (const dosya of input.files) form.append("fotograflar", dosya);
 | `DELETE` | `/api/vaccinations/<id>` | Görevli (kurum) | Silme. |
 | `POST` | `/api/vaccinations/<id>/belge` | Görevli (kurum) | `multipart`, alan adı **`belge`** (PDF/JPG/PNG/WEBP). |
 | `GET` | `/api/vaccinations/<id>/belge` | Herkes | Belgeyi indirir. |
-| `GET` | `/api/vaccinations/yaklasan?gun=7` | Görevli | Önümüzdeki N günde (1–90) dozu gelenler. Görevli sadece kendi kurumlarını görür. |
-| `GET` | `/api/vaccinations/gecikmis` | Görevli | Dozu gecikmiş olanlar. |
-| `GET` | `/api/vaccinations/turler?hayvan_turu_id=1` | Herkes | Aşı türleri (açılır liste). `hayvan_turu_id` verilirse her türde `zorunlu: true/false`. |
+| `GET` | `/api/vaccinations/yaklasan?gun=7&kurum_id=1` | Görevli | Önümüzdeki N günde (1–90) dozu gelenler. Görevli sadece kendi kurumlarını görür; `kurum_id` ile tek kuruma daraltılır (başka kurum → `403`). |
+| `GET` | `/api/vaccinations/gecikmis?kurum_id=1` | Görevli | Dozu gecikmiş olanlar (`kurum_id` isteğe bağlı). |
+| `GET` | `/api/vaccinations/turler?hayvan_turu_id=1` | Herkes | Aşı türleri (açılır liste). `hayvan_turu_id` verilirse her türde `zorunlu: true/false` ve `tekrar_araligi_gun` (sonraki doz önerisi için). |
 | `POST` | `/api/vaccinations/turler` | Admin | `{"ad": "Lösemi", "aciklama": "..."}` |
+| `PUT` | `/api/vaccinations/turler/<id>` | Admin | Düzenleme (`ad`, `aciklama`; sadece gönderilenler değişir). Aynı ad varsa `409`. |
+| `DELETE` | `/api/vaccinations/turler/<id>` | Admin | Silme. Aşı herhangi bir hayvana uygulanmışsa `409`. Türlerin zorunlu aşı listesinden de çıkar. |
 
 **Aşı durumu (`durum`):** `zamaninda` · `yaklasiyor` (≤ 7 gün) · `gecikti` · `tamamlandi` (sonraki doz yok ya da aynı aşının daha yeni dozu girilmiş).
 
@@ -309,7 +313,9 @@ for (const dosya of input.files) form.append("fotograflar", dosya);
   }]
 }
 ```
-Yaklaşan/gecikmiş listelerindeki her kayıtta ayrıca `hayvan` özeti bulunur.
+Yaklaşan/gecikmiş listelerindeki her kayıtta ayrıca `hayvan` özeti bulunur; özette hayvanın `kurum` bilgisi de vardır.
+
+**Sonraki doz önerisi:** Aşı eklerken `sonraki_tarih` boş (veya `null`) gönderilirse ve hayvanın türü için bu aşının tekrar aralığı tanımlıysa (8.5), sonraki doz `uygulama_tarihi + tekrar_araligi_gun` olarak otomatik yazılır. Elle girilen tarih değiştirilmez.
 
 ### 8.4 Acil İhtiyaçlar ve Destek Sözleri
 | Metot | Endpoint | Yetki | Açıklama |
@@ -323,7 +329,8 @@ Yaklaşan/gecikmiş listelerindeki her kayıtta ayrıca `hayvan` özeti bulunur.
 | `POST` | `/api/needs/<id>/pledges` | Herkes | Destek sözü: `ad_soyad`*, `telefon`*, `miktar`*, `kvkk_onay: true`*, `aciklama`. Giriş yapmış kullanıcının ad/telefonu boşsa hesabından alınır. Kapanmış ihtiyaca söz verilemez (`409`). Dakikada en fazla 10 istek. |
 | `GET` | `/api/needs/<id>/pledges` | Görevli (kurum) | Gelen sözler, telefon dahil. |
 | `PATCH` | `/api/pledges/<id>/durum` | Görevli (kurum) | `{"durum": "teslim_edildi"}` (veya `iptal`, `soz_verildi`). |
-| `GET` | `/api/pledges/me` | Giriş yapmış | Kullanıcının kendi destek sözleri (Kullanıcı sekmesi). |
+| `PATCH` | `/api/pledges/<id>/iptal` | Giriş yapmış | Kullanıcı **kendi hesabıyla verdiği** sözü iptal eder. Başkasının sözü → `403`; zaten iptal veya teslim edilmiş → `409`. Giriş yapmadan verilen sözü görevli iptal eder. |
+| `GET` | `/api/pledges/me` | Giriş yapmış | Kullanıcının kendi destek sözleri (Kullanıcı sekmesi). Her sözdeki `ihtiyac` özetinde `birim` de bulunur. |
 
 Destek sözündeki telefon veritabanında şifreli saklanır; herkese açık yanıtlarda telefon dönmez.
 
@@ -342,6 +349,15 @@ Destek sözündeki telefon veritabanında şifreli saklanır; herkese açık yan
 ### 8.5 Hayvan Türleri (`/api/hayvan-turleri`)
 | Metot | Endpoint | Yetki | Açıklama |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/hayvan-turleri` | Herkes | Türler ve her türün `zorunlu_asilar` listesi (filtre açılır listesi için). |
+| `GET` | `/api/hayvan-turleri` | Herkes | Türler ve her türün `zorunlu_asilar` listesi, tekrar aralıklarıyla (filtre açılır listesi için). |
 | `POST` | `/api/hayvan-turleri` | Admin | `{"ad": "Tavşan"}` |
-| `PUT` | `/api/hayvan-turleri/<id>/zorunlu-asilar` | Admin | `{"asi_turu_idleri": [1, 2]}` – türün zorunlu aşı listesini tamamen değiştirir. |
+| `PUT` | `/api/hayvan-turleri/<id>` | Admin | Ad değiştirme: `{"ad": "Kediler"}`. Aynı ad varsa `409`. |
+| `DELETE` | `/api/hayvan-turleri/<id>` | Admin | Silme. O türde kayıtlı hayvan varsa `409`. |
+| `PUT` | `/api/hayvan-turleri/<id>/zorunlu-asilar` | Admin | Türün zorunlu aşı listesini tamamen değiştirir. İki biçimden biri gönderilir (aşağıda). |
+
+**Zorunlu aşılar ve tekrar aralığı:**
+```json
+{"asi_turu_idleri": [1, 2]}
+{"asilar": [{"asi_turu_id": 1, "tekrar_araligi_gun": 365}, {"asi_turu_id": 2}]}
+```
+Birinci biçimde listede kalan aşıların tekrar aralığı korunur, yeni eklenenlerinki boş olur. İkinci biçimde aralık açıkça belirlenir (1–3650 gün, boş bırakılabilir). `GET` yanıtındaki `zorunlu_asilar` öğeleri: `{"id", "ad", "tekrar_araligi_gun"}`.

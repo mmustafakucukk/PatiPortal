@@ -132,11 +132,11 @@ def veritabanini_doldur(sifirla=False):
     db.session.flush()
 
     db.session.add_all([
-        AsiGerekliligi(hayvan_turu=kedi, asi_turu=karma),
-        AsiGerekliligi(hayvan_turu=kedi, asi_turu=kuduz),
-        AsiGerekliligi(hayvan_turu=kopek, asi_turu=karma),
-        AsiGerekliligi(hayvan_turu=kopek, asi_turu=kuduz),
-        AsiGerekliligi(hayvan_turu=kopek, asi_turu=parazit),
+        AsiGerekliligi(hayvan_turu=kedi, asi_turu=karma, tekrar_araligi_gun=365),
+        AsiGerekliligi(hayvan_turu=kedi, asi_turu=kuduz, tekrar_araligi_gun=365),
+        AsiGerekliligi(hayvan_turu=kopek, asi_turu=karma, tekrar_araligi_gun=365),
+        AsiGerekliligi(hayvan_turu=kopek, asi_turu=kuduz, tekrar_araligi_gun=365),
+        AsiGerekliligi(hayvan_turu=kopek, asi_turu=parazit, tekrar_araligi_gun=90),
     ])
 
     # 5. Hayvanlar
